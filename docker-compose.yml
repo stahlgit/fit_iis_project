@@ -14,21 +14,19 @@ services:
       db:
         condition: service_healthy
     # ASGI server
-    command: ["gunicorn", "main:app", "--bind", "0.0.0.0:8000"] 
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
     # WSGI server 
-    # command: ["gunicorn", "main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+    #command: ["gunicorn", "  main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
     networks:
       - iis_network
     environment:
-      - DATABASE_URL=postgresql://postgres:your_password@db:5432/your_db_name  # Use this to connect to the db service
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB}  # Use this to connect to the db service
 
   db:
     image: postgres:16.3-alpine
     container_name: iis_database
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_password
-      POSTGRES_DB: your_db_name
+    env_file:
+      - .env
     networks:
       - iis_network
     healthcheck:
