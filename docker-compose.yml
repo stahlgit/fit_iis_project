@@ -1,0 +1,46 @@
+services:
+  backend: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: iis_backend
+    ports:
+      - 8000:8000
+    restart: 
+      unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # ASGI server
+    command: ["gunicorn", "main:app", "--bind", "0.0.0.0:8000"] 
+    # WSGI server 
+    # command: ["gunicorn", "main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+    networks:
+      - iis_network
+    environment:
+      - DATABASE_URL=postgresql://postgres:your_password@db:5432/your_db_name  # Use this to connect to the db service
+
+  db:
+    image: postgres:16.3-alpine
+    container_name: iis_database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_db_name
+    networks:
+      - iis_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+networks:
+  iis_network:
+    driver: bridge
+
+volumes:
+  pgdata:

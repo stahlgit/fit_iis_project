@@ -7,6 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+gunicorn = "^23.0.0"
+fastapi = "^0.115.0"
+uvicorn = "^0.30.6"
 
 
 [build-system]
