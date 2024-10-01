@@ -1,0 +1,16 @@
+@startuml
+left to right direction
+
+actor Lékař
+actor Sestra
+actor Pacient
+
+rectangle "Ambulance příjem" {
+	Lékař -- (Shrnout data o pacientovi)
+	Lékař -- (Zobrazit data o pacientovi)
+	Lékař -- (Editovat data o pacientovi)
+	Sestra -- (Zobrazit data o pacientovi)
+	Sestra -- (Editovat data o pacientovi)
+	Pacient -- (Přidat data o sobě)
+}
+@enduml
