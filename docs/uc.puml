@@ -5,12 +5,16 @@ actor Lékař
 actor Sestra
 actor Pacient
 
-rectangle "Ambulance příjem" {
-	Lékař -- (Shrnout data o pacientovi)
-	Lékař -- (Zobrazit data o pacientovi)
-	Lékař -- (Editovat data o pacientovi)
-	Sestra -- (Zobrazit data o pacientovi)
-	Sestra -- (Editovat data o pacientovi)
-	Pacient -- (Přidat data o sobě)
+rectangle "Ambulance - zápis sezení příjem, kontrola" {
+	Lékař -- (Zobrazit všechna data o pacientovi)
+	Lékař -- (Editovat všechna data o pacientovi)
+	Lékař -- (Shrnout všechna data o pacientovi)
+	Lékař -- (Editovat nová data o pacientovi)
+	Lékař -- (Shrnout nová data o pacientovi)
+	Sestra -- (Zobrazit všechna data o pacientovi)
+	Sestra -- (Editovat všechna data o pacientovi)
+	Sestra -- (Editovat nová data o pacientovi)
+	Pacient -- (Přidat nová data o sobě)
+	Pacient -- (Editovat nová data o sobě)
 }
 @enduml
