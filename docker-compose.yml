@@ -1,5 +1,5 @@
 services:
-  backend: 
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,19 +8,19 @@ services:
     container_name: iis_backend
     ports:
       - 8000:8000
-    restart: 
-      unless-stopped
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     # ASGI server
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
-    # WSGI server 
+    command:
+      ['uvicorn', 'main:app', '--host', '0.0.0.0', '--port', '8000', '--reload']
+    # WSGI server
     #command: ["gunicorn", "  main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
     networks:
       - iis_network
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB}  # Use this to connect to the db service
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB} # Use this to connect to the db service
 
   db:
     image: postgres:16.3-alpine
@@ -30,7 +30,7 @@ services:
     networks:
       - iis_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       retries: 5
     volumes:
