@@ -1,124 +1,88 @@
 @startuml erd
 
-entity "Zaměstnanec" as za {
-	ID zaměstnance <<PK>>
-	---
-	Jméno
-	Příjmení
-	Login
-	Heslo
-}
-
-entity "Administrátor" as ad{
-	---
-}
-entity "Lékař" as le{
-	---
-}
-entity "Sestra" as se{
-	---
-}
-
-entity "Pacient"{
-	Rodné číslo <<PK>>
-	---
-	Jméno
-	Příjmení
-	Kontaktní telefon
-	Rok narození
-	Současný lékař
-	Anamnéza sepsána s
-}
-
-entity "Osobní anamnéza" as oa {
-	ID <PK>
-	---
-	Datum zápisu
-	Předchozí vyšetření
-	PPP
-	OSPOD
-	Dispenzarizace
-	Pobyt v zařízení
-	Léky
-	Transfůze
-	Porod
-	VVV
-	Kojení
-	PMV
-	Úrazy
-	Operace
-	Záchvaty
-	FF
-	Alergie
-	Lateralita
-	Výslovnost
-	Povaha
-	Kamarádi
-	Zájmy
-	Abusus
-	Scholarita
-}
-
-entity "Rodiná anamnéza" as ra {
-	ID <PK>
-	---
-	Datum zápisu
-	Heredidita
-}
-
-entity "Ostatní informace" as info {
-	ID <PK>
-	---
-	Datum zápisu
-	Text
-}
-
-entity "Dekurs" as dek {
-	ID <PK>
-	---
-}
-
-entity "Spřízněná osoba" as osoba {
+entity "Účet" as ucet {
 	ID <<PK>>
 	---
-	Jméno
-	Příjmení
-	Zdravotní stav
-	Vzdělání
-	Vztah k pacientovi
+	+ Login
+	+ Heslo
+	+ Jméno
+	+ Příjmení
+	+ Telefon
+	+ e-mail
+	+ Adresa
+	+ Věk
 }
 
-entity "Otec" {
-	---
-	Bio
-}
-entity "Matka" {
-	---
-	Bio
-}
-entity "Bratr" {
-	---
-}
-entity "Sestra" {
-	---
-}
-entity "Ostatní" as os{
+entity "Organizátor" as org{
 	---
 }
 
-ra ||--|{ osoba : je ve vztahu
-Pacient ||--o{ oa : má
-Pacient ||--o{ ra : má
-Pacient ||--o{ info : má
+entity "Pořadatel" as poradatel {
+	---
+}
+
+entity "Uživatel" as uzivatel {
+	---
+}
+
+entity "Místo" as misto {
+	ID <<PK>>
+	---
+	+ Jméno
+	+ Lokace
+	+ Kapacita
+}
+
+entity "Událost" as udalost {
+	ID <<PK>>
+	---
+	+ Datum
+	+ Délka
+	+ Kapacita
+}
+
+entity "Program" as prog {
+	ID <<PK>>
+	---
+	+ Varianta
+}
+
+entity "Programový blok" as progblok {
+	ID <<PK>>
+	---
+	+ Název
+	+ Typ
+	+ Délka
+	+ Shrnutí
+	+ Popis
+}
+
+entity "Lístek" as listek {
+}
+
+entity "Vzor lístku" {
+	ID <<PK>>
+	---
+	+ Cena
+	+ Splatnost
+	+ Zaplaceno
+	+ Další položky
+}
+
+org ||--o{ misto
+misto ||--o{ udalost
+udalost ||--o{ prog
+prog ||--o{ progblok
+ucet ||--o{ listek
+udalost ||--o{ listek
+udalost |o--o{ poradatel
+
+listek ||--o{ uzivatel
+poradatel }o--o{ progblok
 
 ' generalizace
-le --|> za
-se --|> za
-ad --|> za
-Otec --|> osoba
-Matka --|> osoba
-Bratr --|> osoba
-Sestra --|> osoba
-os --|> osoba
+org --|> ucet
+poradatel --|> ucet
+uzivatel --|> ucet
 
 @enduml
