@@ -1,10 +1,8 @@
 @startuml erd
 
-entity "Účet" as ucet {
+entity "Osoba" as osoba {
 	ID <<PK>>
 	---
-	+ Login
-	+ Heslo
 	+ Jméno
 	+ Příjmení
 	+ Telefon
@@ -22,7 +20,10 @@ entity "Pořadatel" as poradatel {
 }
 
 entity "Uživatel" as uzivatel {
+	ID <<PK>>
 	---
+	+ Login
+	+ Heslo
 }
 
 entity "Místo" as misto {
@@ -73,16 +74,18 @@ org ||--o{ misto
 misto ||--o{ udalost
 udalost ||--o{ prog
 prog ||--o{ progblok
-ucet ||--o{ listek
+uzivatel ||--o{ listek
 udalost ||--o{ listek
 udalost |o--o{ poradatel
 
-listek ||--o{ uzivatel
+listek }|--o{ osoba
 poradatel }o--o{ progblok
 
 ' generalizace
-org --|> ucet
-poradatel --|> ucet
-uzivatel --|> ucet
+org --|> uzivatel
+poradatel --|> uzivatel
+org --|> osoba
+poradatel --|> osoba
+uzivatel --|> osoba
 
 @enduml
