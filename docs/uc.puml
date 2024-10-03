@@ -11,16 +11,17 @@ Pořadatel --|> Osoba
 Organizátor --|> Osoba
 
 rectangle "Mapa událostí" {
-	Osoba -- (Zobrazit mapu míst)
+	Osoba -- (Zobrazit mapu/seznam míst)
 	Osoba -- (Zobrazit události místa)
 	Osoba -- (Zobrazit programy události)
 	Osoba -- (Zobrazit programové bloky události)
-	Osoba -- (Zobrazit lístek)
 	Osoba -- (Přihlásit se)
 	Osoba -- (Registrovat se)
 	Uživatel -- (Sledovat místo)
 	Uživatel -- (Koupit lístek)
 	Uživatel -- (Koupit lístek někomu jinému)
+	Uživatel -- (Zobrazit lístek)
+	Uživatel -- (Přihlásit lístek)
 	Organizátor -- (Přidat událost)
 	Organizátor -- (Přidat místo)
 	Organizátor -- (Přidat program)

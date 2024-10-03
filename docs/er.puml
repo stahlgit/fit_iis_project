@@ -61,7 +61,7 @@ entity "Programový blok" as progblok {
 entity "Lístek" as listek {
 }
 
-entity "Vzor lístku" {
+entity "Vzor lístku" as vzorlistku {
 	ID <<PK>>
 	---
 	+ Cena
@@ -87,5 +87,6 @@ poradatel --|> uzivatel
 org --|> osoba
 poradatel --|> osoba
 uzivatel --|> osoba
+listek --|> vzorlistku
 
 @enduml
