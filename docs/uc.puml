@@ -1,20 +1,31 @@
 @startuml
 left to right direction
 
-actor Lékař
-actor Sestra
-actor Pacient
+actor Osoba
+actor Organizátor
+actor Pořadatel
+actor Uživatel
 
-rectangle "Ambulance - zápis sezení příjem, kontrola" {
-	Lékař -- (Zobrazit všechna data o pacientovi)
-	Lékař -- (Editovat všechna data o pacientovi)
-	Lékař -- (Shrnout všechna data o pacientovi)
-	Lékař -- (Editovat nová data o pacientovi)
-	Lékař -- (Shrnout nová data o pacientovi)
-	Sestra -- (Zobrazit všechna data o pacientovi)
-	Sestra -- (Editovat všechna data o pacientovi)
-	Sestra -- (Editovat nová data o pacientovi)
-	Pacient -- (Přidat nová data o sobě)
-	Pacient -- (Editovat nová data o sobě)
+Uživatel  --|> Osoba
+Pořadatel --|> Osoba
+Organizátor --|> Osoba
+
+rectangle "Mapa událostí" {
+	Osoba -- (Zobrazit mapu míst)
+	Osoba -- (Zobrazit události místa)
+	Osoba -- (Zobrazit programy události)
+	Osoba -- (Zobrazit programové bloky události)
+	Osoba -- (Zobrazit lístek)
+	Osoba -- (Přihlásit se)
+	Osoba -- (Registrovat se)
+	Uživatel -- (Sledovat místo)
+	Uživatel -- (Koupit lístek)
+	Uživatel -- (Koupit lístek někomu jinému)
+	Organizátor -- (Přidat událost)
+	Organizátor -- (Přidat místo)
+	Organizátor -- (Přidat program)
+	Organizátor -- (Přidat bloky programu)
+	Organizátor -- (Notifikovat pořadatele události)
+	Organizátor -- (Notifikovat účastníky události)
 }
 @enduml
