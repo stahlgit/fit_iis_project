@@ -1,0 +1,2 @@
+main:
+	plantuml er.puml

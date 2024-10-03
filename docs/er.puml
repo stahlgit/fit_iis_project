@@ -1,91 +1,100 @@
-@startuml erd
+@startuml
 
-entity "Osoba" as osoba {
-	ID <<PK>>
-	---
-	+ Jméno
-	+ Příjmení
-	+ Telefon
-	+ e-mail
-	+ Adresa
-	+ Věk
+entity "Konference" {
+  +id: int <<PK>>
+  ---
+  +název: String
+  +popis: String
+  +žánr: String
+  +místo: String
+  +časový_interval: DateTimeRange
+  +cena: Float
+  +kapacita: int
 }
 
-entity "Organizátor" as org{
-	---
+entity "Místnost" {
+  +id: int <<PK>>
+  ---
+  +název: String
+  +kapacita: int
+  +konference_id: int <<FK>>
 }
 
-entity "Pořadatel" as poradatel {
-	---
+entity "Přednáška" {
+  +id: int <<PK>>
+  ---
+  +název: String
+  +přednášející: int <<FK>>
+  +popis: String
+  +čas: DateTimeRange
+  +místnost_id: int <<FK>>
+  +konference_id: int <<FK>>
+  +tagy: String
+  +obrázek: String
 }
 
-entity "Uživatel" as uzivatel {
-	ID <<PK>>
-	---
-	+ Login
-	+ Heslo
+entity "Uživatel" {
+  +id: int <<PK>>
+  ---
+  +jméno: String
+  +email: String
+  +role: String
 }
 
-entity "Místo" as misto {
-	ID <<PK>>
-	---
-	+ Jméno
-	+ Lokace
-	+ Kapacita
+entity "Rezervace" {
+  +id: int <<PK>>
+  ---
+  +uživatel_id: int <<FK>>
+  +konference_id: int <<FK>>
+  +počet_vstupenek: int
+  +stav: String
+  +uhrazeno: Boolean
 }
 
-entity "Událost" as udalost {
-	ID <<PK>>
-	---
-	+ Datum
-	+ Délka
-	+ Kapacita
+entity "Podaná prezentace" {
+  +id: int <<PK>>
+  ---
+  +uživatel_id: int <<FK>>
+  +konference_id: int <<FK>>
+  +návrh_prezentace: String
+  +stav: String
 }
 
-entity "Program" as prog {
-	ID <<PK>>
-	---
-	+ Varianta
+entity "Vstupenka" {
+  +id: int <<PK>>
+  ---
+  +rezervace_id: int <<FK>>
+  +vytvořeno: DateTime
 }
 
-entity "Programový blok" as progblok {
-	ID <<PK>>
-	---
-	+ Název
-	+ Typ
-	+ Délka
-	+ Shrnutí
-	+ Popis
+entity "Hlasování" {
+  +id: int <<PK>>
+  ---
+  +uživatel_id: int <<FK>>
+  +prezentace_id: int <<FK>>
+  +hodnocení: int
 }
 
-entity "Lístek" as listek {
+entity "Otázka" {
+  +id: int <<PK>>
+  ---
+  +uživatel_id: int <<FK>>
+  +prezentace_id: int <<FK>>
+  +text: String
 }
 
-entity "Vzor lístku" {
-	ID <<PK>>
-	---
-	+ Cena
-	+ Splatnost
-	+ Zaplaceno
-	+ Další položky
-}
+' Kardinality pomocí Crow's Foot notace
 
-org ||--o{ misto
-misto ||--o{ udalost
-udalost ||--o{ prog
-prog ||--o{ progblok
-uzivatel ||--o{ listek
-udalost ||--o{ listek
-udalost |o--o{ poradatel
-
-listek }|--o{ osoba
-poradatel }o--o{ progblok
-
-' generalizace
-org --|> uzivatel
-poradatel --|> uzivatel
-org --|> osoba
-poradatel --|> osoba
-uzivatel --|> osoba
+Uživatel ||--o{ Rezervace : "provádí"
+Konference ||--o{ Rezervace : "obsahuje"
+Uživatel ||--o{ "Podaná prezentace" : "registruje"
+Konference ||--o{ "Podaná prezentace" : "obsahuje"
+Místnost ||--o{ Přednáška : "obsahuje"
+Konference ||--o{ Místnost : "má"
+Přednáška ||--o{ Hlasování : "hodnocena"
+Přednáška ||--o{ Otázka : "má"
+Konference ||--o{ Přednáška : "je součástí"
+Uživatel ||--o{ Přednáška : "přednáší na"
+Vstupenka }o--|| Rezervace : "patří k"
 
 @enduml
