@@ -2,30 +2,10 @@
 left to right direction
 
 actor Osoba
-actor Organizátor
-actor Pořadatel
 actor Uživatel
 
-Uživatel  --|> Osoba
-Pořadatel --|> Osoba
-Organizátor --|> Osoba
+rectangle "Konference - plánovací systém" {
 
-rectangle "Mapa událostí" {
-	Osoba -- (Zobrazit mapu míst)
-	Osoba -- (Zobrazit události místa)
-	Osoba -- (Zobrazit programy události)
-	Osoba -- (Zobrazit programové bloky události)
-	Osoba -- (Zobrazit lístek)
-	Osoba -- (Přihlásit se)
-	Osoba -- (Registrovat se)
-	Uživatel -- (Sledovat místo)
-	Uživatel -- (Koupit lístek)
-	Uživatel -- (Koupit lístek někomu jinému)
-	Organizátor -- (Přidat událost)
-	Organizátor -- (Přidat místo)
-	Organizátor -- (Přidat program)
-	Organizátor -- (Přidat bloky programu)
-	Organizátor -- (Notifikovat pořadatele události)
-	Organizátor -- (Notifikovat účastníky události)
 }
+
 @enduml
