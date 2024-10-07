@@ -1,30 +1,9 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    container_name: iis_backend
-    ports:
-      - 8000:8000
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    # ASGI server
-    # command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-    # WSGI server
-    # command: ["gunicorn", "  main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
-    command: ['./.entrypoint.sh']
-    networks:
-      - iis_network
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB} # Use this to connect to the db service
-
   db:
     image: postgres:16.3-alpine
     container_name: iis_database
+    ports:
+      - ${DB_PORT}:${POSTGRES_PORT}
     env_file:
       - .env
     networks:
