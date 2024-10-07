@@ -1,5 +1,5 @@
 services:
-  backend: 
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,19 +8,19 @@ services:
     container_name: iis_backend
     ports:
       - 8000:8000
-    restart: 
-      unless-stopped
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     # ASGI server
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
-    # WSGI server 
-    #command: ["gunicorn", "  main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+    # command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    # WSGI server
+    # command: ["gunicorn", "  main:app", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+    command: ['./.entrypoint.sh']
     networks:
       - iis_network
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB}  # Use this to connect to the db service
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB} # Use this to connect to the db service
 
   db:
     image: postgres:16.3-alpine
@@ -29,8 +29,9 @@ services:
       - .env
     networks:
       - iis_network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
       retries: 5
     volumes:
@@ -39,6 +40,12 @@ services:
 networks:
   iis_network:
     driver: bridge
+    name: iis_network
 
 volumes:
   pgdata:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './pgdata'

@@ -1,3 +1,7 @@
 /.gitignore
 /tests
 /README.md
+__pycache__
+*.pyc
+.env
+.git
