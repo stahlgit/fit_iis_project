@@ -1,3 +1,4 @@
+import enum
 from decimal import Decimal
 from typing import List, Optional
 
@@ -5,6 +6,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
+    Enum,
     Float,
     ForeignKey,
     Integer,
@@ -21,6 +23,12 @@ from app.api.base import (
     CreateException,
     MissingRequiredFieldException,
 )
+
+
+class UserRole(enum.Enum):
+    ADMIN = "admin"
+    REGISTERED = "registered"
+    GUEST = "guest"
 
 
 class Conference(BaseModelMixin, Base):
@@ -62,7 +70,9 @@ class User(BaseModelMixin, Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
-    role: Mapped[Optional[str]] = mapped_column(String, nullable=False)  ##TODO Enum ???
+    role: Mapped[Optional[str]] = mapped_column(
+        Enum(UserRole), nullable=False, default=UserRole.GUEST
+    )
     # TODO password hashing
 
     lectures: Mapped[List["Lecture"]] = relationship(
@@ -111,13 +121,15 @@ class Reservation(BaseModelMixin, Base):
     paid: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False
+        Integer, ForeignKey("users.id"), nullable=True  # HERE WAS FALSE
     )
     conference_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("conferences.id"), nullable=False
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="reservations")
+    user: Mapped[Optional["User"]] = relationship(
+        "User", back_populates="reservations"
+    )  # NEW OPTIONAL USER
     conference: Mapped["Conference"] = relationship(
         "Conference", back_populates="reservations"
     )
