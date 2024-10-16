@@ -13,18 +13,11 @@ services:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
       retries: 5
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+
 
 networks:
   iis_network:
     driver: bridge
     name: iis_network
 
-volumes:
-  pgdata:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: './pgdata'
+
