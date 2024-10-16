@@ -76,7 +76,7 @@ class User(BaseModelMixin, Base):
 
 
 class Room(BaseModelMixin, Base):
-    __table__ = "rooms"
+    __tablename__ = "rooms"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
@@ -89,7 +89,7 @@ class Room(BaseModelMixin, Base):
 
 
 class Reservation(BaseModelMixin, Base):
-    __table__ = "reservations"
+    __tablename__ = "reservations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     number_of_tickets = mapped_column(Integer, nullable=False)
@@ -104,7 +104,7 @@ class Reservation(BaseModelMixin, Base):
 
 
 class Ticket(BaseModelMixin, Base):
-    __table__ = "tickets"
+    __tablename__ = "tickets"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     conference_id = mapped_column(Integer, nullable=False)
@@ -119,7 +119,7 @@ class Ticket(BaseModelMixin, Base):
 
 
 class Lecture(BaseModelMixin, Base):
-    __table__ = "lectures"
+    __tablename__ = "lectures"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
@@ -149,7 +149,7 @@ class Lecture(BaseModelMixin, Base):
 
 
 class GivenPresentation(BaseModelMixin, Base):
-    __table__ = "given_presentations"
+    __tablename__ = "given_presentations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """ user_id = mapped_column(Integer, nullable=False)
@@ -162,7 +162,7 @@ class GivenPresentation(BaseModelMixin, Base):
 
 
 class Voting(BaseModelMixin, Base):
-    __table__ = "voting"
+    __tablename__ = "voting"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user = relationship("User", back_populates="votings")
@@ -170,7 +170,7 @@ class Voting(BaseModelMixin, Base):
 
 
 class Question(BaseModelMixin, Base):
-    __table__ = "questions"
+    __tablename__ = "questions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[str] = mapped_column(String, nullable=False)
