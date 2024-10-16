@@ -1,11 +1,46 @@
 @startuml
 left to right direction
 
-actor Osoba
-actor Uživatel
+actor Administrator
+actor RegisteredUser
+actor UnregisteredUser
 
 rectangle "Konference - plánovací systém" {
 
+usecase "Manage Users" as UC1
+usecase "Create Conference" as UC2
+usecase "Manage Rooms" as UC3
+usecase "Approve Presentations" as UC4
+usecase "Create Time Schedule" as UC5
+usecase "Submit Presentation" as UC6
+usecase "View Conference Schedule" as UC7
+usecase "Book Tickets" as UC8
+usecase "Pay for Reservation" as UC9
+usecase "View Conferences" as UC10
+usecase "Make Reservation" as UC11
+usecase "Ask Questions" as UC12
+usecase "Vote for Presentation" as UC13
+
 }
+
+Administrator --> UC1
+Administrator --> UC2
+Administrator --> UC3
+Administrator --> UC4
+Administrator --> UC5
+
+RegisteredUser --> UC2
+RegisteredUser --> UC3
+RegisteredUser --> UC4
+RegisteredUser --> UC5
+RegisteredUser --> UC6
+RegisteredUser --> UC7
+RegisteredUser --> UC8
+RegisteredUser --> UC9
+RegisteredUser --> UC12
+RegisteredUser --> UC13
+
+UnregisteredUser --> UC10
+UnregisteredUser --> UC11
 
 @enduml
