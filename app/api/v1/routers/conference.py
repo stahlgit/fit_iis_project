@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.crud import conference as crud
 from app.api.v1.schemas import conference as schemas
-from app.services import get_db
+from app.services.database import get_db
 
 router = APIRouter(
     prefix="/conferences",

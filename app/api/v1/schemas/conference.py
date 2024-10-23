@@ -1,8 +1,10 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from app.api.models import Conference
+
+# TODO add room and lecture schemas
 
 
 class ConferenceBase(BaseModel):
@@ -31,12 +33,8 @@ class ConferenceUpdate(BaseModel):
 
 class ConferenceRead(ConferenceBase):
     id: int
-    rooms: List[RoomRead] = []
-    lectures: List[LectureRead] = []
+    # rooms: List[RoomRead] = []
+    # lectures: List[LectureRead] = []
 
     class Config:
-        orm_mode = True
-
-
-class Conferences(BaseModel):
-    __root__: List[ConferenceRead]
+        from_attributes = True

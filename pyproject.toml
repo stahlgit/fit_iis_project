@@ -12,6 +12,7 @@ fastapi = "^0.115.0"
 uvicorn = "^0.30.6"
 alembic = "^1.13.3"
 psycopg = {extras = ["bin"], version = "^3.2.3"}
+python-dotenv = "^1.0.1"
 
 
 
