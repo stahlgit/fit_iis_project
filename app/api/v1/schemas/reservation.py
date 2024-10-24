@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -23,9 +25,6 @@ class ReservationUpdateSchema(ReservationBase):
 
 class ReservationSchema(ReservationBase):
     id: int
-    user: Optional[schemas.UserSchema] = None
-    conference: schemas.ConferenceSchema
-    tickets: List[schemas.TicketSchema] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

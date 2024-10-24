@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
 
 import app.api.v1.schemas as schemas
@@ -15,8 +17,6 @@ class QuestionCreateSchema(QuestionBase):
 
 class QuestionSchema(QuestionBase):
     id: int
-    user: schemas.UserSchema
-    lecture: schemas.LectureSchema
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -16,6 +18,8 @@ class LectureBase(BaseModel):
     conference_id: int
     lecturer_id: int
 
+    model_config = {"arbitrary_types_allowed": True}
+
 
 class LectureCreateSchema(LectureBase):
     pass
@@ -27,11 +31,6 @@ class LectureUpdateSchema(LectureBase):
 
 class LectureSchema(LectureBase):
     id: int
-    room: schemas.RoomSchema
-    conference: schemas.ConferenceSchema
-    lecturer: schemas.UserSchema
-    voting: List[schemas.VotingSchema] = []
-    questions: List[schemas.QuestionSchema] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

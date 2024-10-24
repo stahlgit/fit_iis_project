@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from pydantic import BaseModel
@@ -22,8 +24,6 @@ class GivenPresentationUpdateSchema(GivenPresentationBase):
 
 class GivenPresentationSchema(GivenPresentationBase):
     id: int
-    user: schemas.UserSchema
-    conference: schemas.ConferenceSchema
 
     class Config:
-        orm_more = True
+        from_attributes = True

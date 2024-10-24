@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -22,8 +24,6 @@ class RoomUpdateSchema(RoomBase):
 
 class RoomSchema(RoomBase):
     id: int
-    conference: schemas.ConferenceSchema
-    lectures: List[schemas.LectureSchema] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 from typing import List, Optional
 
@@ -34,20 +36,15 @@ class UserRead(UserBase):
     reservation: List[schemas.ReservationSchema]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
-class Users(BaseModel):
-    __root__: List[UserRead]
+# class Users(BaseModel):
+# __root__: List[UserRead]
 
 
 class UserSchema(UserBase):
     id: int
-    lectures: List[schemas.LectureSchema] = []
-    voting: List[schemas.VotingSchema] = []
-    questions: List[schemas.QuestionSchema] = []
-    reservations: List[schemas.ReservationSchema] = []
-    given_presentations: List[schemas.GivenPresentationSchema] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

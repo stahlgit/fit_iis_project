@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.post(
-    "/", response_model=schemas.ConferenceRead, status_code=status.HTTP_201_CREATED
+    "/", response_model=schemas.ConferenceCreate, status_code=status.HTTP_201_CREATED
 )
 async def create_conference(
     conference_in: schemas.ConferenceCreate, db: Session = Depends(get_db)
@@ -31,7 +31,7 @@ async def create_conference(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.get("/all", response_model=List[schemas.ConferenceRead])
+@router.get("/all", response_model=List[schemas.ConferenceCreate])
 async def read_conferences(
     skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 ):
@@ -41,7 +41,7 @@ async def read_conferences(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.get("/{conference_id}", response_model=schemas.ConferenceRead)
+@router.get("/{conference_id}", response_model=schemas.ConferenceCreate)
 async def read_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
         conference = await models.Conference.get(db, id=conference_id)
@@ -52,7 +52,7 @@ async def read_conference(conference_id: int, db: Session = Depends(get_db)):
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.put("/{conference_id}", response_model=schemas.ConferenceRead)
+@router.put("/{conference_id}", response_model=schemas.ConferenceUpdate)
 async def update_conference(
     conference_id: int,
     conference_in: schemas.ConferenceUpdate,
@@ -73,7 +73,7 @@ async def update_conference(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{conference_id}", response_model=schemas.ConferenceRead)
+@router.delete("/{conference_id}", response_model=schemas.ConferenceCreate)
 async def delete_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
         conference = await models.Conference.get(db, id=conference_id)

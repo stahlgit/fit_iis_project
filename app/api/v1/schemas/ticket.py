@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
@@ -21,7 +23,7 @@ class TicketUpdateSchema(TicketBase):
 
 class TicketSchema(TicketBase):
     id: int
-    reservation: schemas.ReservationSchema
+    # reservation: schemas.ReservationSchema
 
     class Config:
-        orm_mode = True
+        from_attributes = True

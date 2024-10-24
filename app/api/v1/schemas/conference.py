@@ -1,7 +1,9 @@
+from __future__ import annotations
+
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
-from sqlalchemy.dialects.postgresql import TSTZRANGE
 
 from app.api.v1 import schemas as schemas
 
@@ -11,9 +13,11 @@ class ConferenceBase(BaseModel):
     description: Optional[str] = None
     genre: Optional[str] = None
     place: Optional[str] = None
-    time_interval: Optional[TSTZRANGE] = None
+    time_interval: Optional[tuple[datetime, datetime]] = None
     price: Optional[float] = None
     capacity: Optional[int] = None
+
+    model_config = {"arbitrary_types_allowed": True}
 
 
 class ConferenceCreate(ConferenceBase):
@@ -30,23 +34,8 @@ class ConferenceUpdate(BaseModel):
     capacity: Optional[int] = None
 
 
-class ConferenceRead(ConferenceBase):
+class ConferenceSchema(ConferenceBase):
     id: int
-    rooms: List[
-        schemas.RoomSchema
-    ] = []  # or we could update this for RoomReadSchema --> specific things for reading
-    lectures: List[schemas.LectureSchema] = []
 
     class Config:
         from_attributes = True
-
-
-class ConferenceSchema(ConferenceBase):
-    id: int
-    rooms: List[schemas.RoomSchema] = []
-    lectures: List[schemas.LectureSchema] = []
-    reservations: List[schemas.ReservationSchema] = []
-    given_presentations: List[schemas.GivenPresentationSchema] = []
-
-    class Config:
-        orm_mode = True
