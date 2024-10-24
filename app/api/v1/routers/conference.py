@@ -3,11 +3,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api import models
-from app.api.crud import conference as CRUDconference  # # TODO nejak to upratat
 from app.api.models import Conference
 from app.api.v1.schemas import conference as schemas
 from app.services.database import get_db
+from app.services.utils import not_found
 
 router = APIRouter(
     prefix="/conferences",
@@ -23,20 +22,18 @@ async def create_conference(
     conference_in: schemas.ConferenceCreate, db: Session = Depends(get_db)
 ):
     try:
-        existing_conference = CRUDconference.get_by_name(db, name=conference_in.name)
+        existing_conference = Conference.get_by(name=conference_in.name)
         if existing_conference:
             raise HTTPException(status_code=400, detail="Conference already registered")
-        return await models.Conference.create(db, conference_in)
+        return await Conference.create(db, conference_in)
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
 
 @router.get("/all", response_model=List[schemas.ConferenceCreate])
-async def read_conferences(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-):
+async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit
     try:
-        return await models.Conference.get_all(db)
+        return await Conference.get_all(db)
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
@@ -44,10 +41,10 @@ async def read_conferences(
 @router.get("/{conference_id}", response_model=schemas.ConferenceCreate)
 async def read_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
-        conference = await models.Conference.get(db, id=conference_id)
+        conference = Conference.get(db, id=conference_id)
         return await conference
     except conference.DoesNotExist:
-        raise HTTPException(status_code=404, detail="Conference not found")
+        not_found("Conference")
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
@@ -59,10 +56,10 @@ async def update_conference(
     db: Session = Depends(get_db),
 ):
     try:
-        conference = await models.Conference.get(db, id=conference_id)
+        conference = await Conference.get(db, id=conference_id)
         if conference is None:
-            raise HTTPException(status_code=404, detail="Conference not found")
-        conference = await models.Conference.update(
+            not_found("Conference")
+        conference = await Conference.update(
             db, id=conference_id, **conference_in.model_dump()
         )
         await db.commit()  # a tak pre istotu asi xddd
@@ -73,15 +70,15 @@ async def update_conference(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{conference_id}", response_model=schemas.ConferenceCreate)
+@router.delete("/{conference_id}")
 async def delete_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
-        conference = await models.Conference.get(db, id=conference_id)
+        conference = await Conference.get(db, id=conference_id)
         if conference is None:
-            raise HTTPException(status_code=404, detail="Conference not found")
+            not_found("Conference")
 
-        await models.Conference.delete(db, id=conference_id)
+        await Conference.delete(db, id=conference_id)
         await db.commit()
         return conference  # Returning the deleted conference for consistency (optional)
     except Exception as e:
-        raise HTTPException(400, f"Error occurred: {e}")
+        raise HTTPException(status_code=400, detail=f"Error occurred: {e}")

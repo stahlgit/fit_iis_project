@@ -15,6 +15,10 @@ class QuestionCreateSchema(QuestionBase):
     pass
 
 
+class QuestionUpdateSchema(QuestionBase):
+    pass
+
+
 class QuestionSchema(QuestionBase):
     id: int
 

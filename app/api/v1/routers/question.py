@@ -1,0 +1,73 @@
+from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from requests import Session
+
+from app.api.models import Question
+from app.api.v1.schemas import question as schemas
+from app.services.database import get_db
+from app.services.utils import not_found
+
+router = APIRouter(
+    prefix="question",
+    tags=["question"],
+    esponses={404: {"description": "Not found"}},
+)
+
+
+@router.post(
+    "/", response_model=schemas.QuestionSchema, status_code=status.HTTP_201_CREATED
+)
+async def create_question(
+    question_in: schemas.QuestionCreateSchema, db: Session = Depends(get_db)
+):
+    try:
+        return await Question.create(db, question_in)
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.get("/all", response_model=List[schemas.QuestionSchema])
+async def read_questions(db: Session = Depends(get_db)):
+    try:
+        return await Question.get_all(db)
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.get("/{question_id}", response_model=schemas.QuestionSchema)
+async def read_question(question_id: int, db: Session = Depends(get_db)):
+    try:
+        question = Question.get(db, id=question_id)
+        return await question
+    except question.DoesNotExist:
+        not_found("Question")
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.put("/{question_id}", response_model=schemas.QuestionUpdateSchema)
+async def update_question(
+    question_id: int,
+    question_in: schemas.QuestionUpdateSchema,
+    db: Session = Depends(get_db),
+):
+    try:
+        question = Question.get(db, id=question_id)
+        if question is None:
+            not_found("Reservation")
+        return await Question.update(db, id=question_id, **question_in.model_dump())
+    except Exception as e:
+        raise HTTPException(400, f"Error occurred: {e}")
+
+
+@router.delete("/{question_id}")
+async def delete_lecture(question_id: int, db: Session = Depends(get_db)):
+    try:
+        question = await Question.get(db, id=question_id)
+        if question is None:
+            not_found("Reservation")
+        await Question.delete(db, id=question_id)
+        return question
+    except Exception as e:
+        raise HTTPException(400, f"Error occurred: {e}")
