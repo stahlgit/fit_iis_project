@@ -1,10 +1,9 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
+from sqlalchemy.dialects.postgresql import TSTZRANGE
 
-from app.api.models import Conference
-
-# TODO add room and lecture schemas
+from app.api.v1 import schemas as schemas
 
 
 class ConferenceBase(BaseModel):
@@ -12,7 +11,7 @@ class ConferenceBase(BaseModel):
     description: Optional[str] = None
     genre: Optional[str] = None
     place: Optional[str] = None
-    time_interval: str  ## TODO TSTZRANGE
+    time_interval: Optional[TSTZRANGE] = None
     price: Optional[float] = None
     capacity: Optional[int] = None
 
@@ -33,8 +32,21 @@ class ConferenceUpdate(BaseModel):
 
 class ConferenceRead(ConferenceBase):
     id: int
-    # rooms: List[RoomRead] = []
-    # lectures: List[LectureRead] = []
+    rooms: List[
+        schemas.RoomSchema
+    ] = []  # or we could update this for RoomReadSchema --> specific things for reading
+    lectures: List[schemas.LectureSchema] = []
 
     class Config:
         from_attributes = True
+
+
+class ConferenceSchema(ConferenceBase):
+    id: int
+    rooms: List[schemas.RoomSchema] = []
+    lectures: List[schemas.LectureSchema] = []
+    reservations: List[schemas.ReservationSchema] = []
+    given_presentations: List[schemas.GivenPresentationSchema] = []
+
+    class Config:
+        orm_mode = True
