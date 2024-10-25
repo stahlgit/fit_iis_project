@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from requests import Session
+from sqlalchemy.orm import Session
 
 from app.api.models import Room
 from app.api.v1.schemas import room as schemas
@@ -9,9 +9,9 @@ from app.services.database import get_db
 from app.services.utils import not_found
 
 router = APIRouter(
-    prefix="room",
+    prefix="/room",
     tags=["room"],
-    esponses={404: {"description": "Not found"}},
+    responses={404: {"description": "Not found"}},
 )
 
 

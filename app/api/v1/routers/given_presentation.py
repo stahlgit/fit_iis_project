@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from requests import Session
+from sqlalchemy.orm import Session
 
 from app.api.models import GivenPresentation
 from app.api.v1.schemas import given_presentation as schemas
@@ -9,7 +9,7 @@ from app.services.database import get_db
 from app.services.utils import not_found
 
 router = APIRouter(
-    prefix="given_presentation",
+    prefix="/given_presentation",
     tags=["given_presentation"],
     responses={404: {"description": "Not found"}},
 )

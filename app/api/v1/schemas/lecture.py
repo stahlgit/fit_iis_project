@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
-from sqlalchemy.dialects.postgresql import TSTZRANGE
 
 import app.api.v1.schemas as schemas
 
@@ -11,7 +11,7 @@ import app.api.v1.schemas as schemas
 class LectureBase(BaseModel):
     name: str
     description: Optional[str] = None
-    time_interval: Optional[TSTZRANGE] = None
+    time_interval: Optional[tuple[datetime, datetime]] = None
     tags: Optional[str] = None
     image: Optional[str] = None
     room_id: int
