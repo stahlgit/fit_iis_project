@@ -3,7 +3,6 @@ from os import getenv
 from typing import AsyncIterator
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import (
     AsyncConnection,
     AsyncEngine,
@@ -11,11 +10,10 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-Base = declarative_base()  # prvá základná classa, bude sa z nej inheritovať
+Base = declarative_base()  # Base class for models
 
 
 class DatabaseSessionManager:
@@ -25,7 +23,9 @@ class DatabaseSessionManager:
 
     def init(self, host: str):
         self._engine = create_async_engine(host)
-        self._sessionmaker = async_sessionmaker(autocommit=False, bind=self._engine)
+        self._sessionmaker = async_sessionmaker(
+            autocommit=False, autoflush=False, bind=self._engine
+        )
 
     async def close(self):
         if self._engine is None:
@@ -37,7 +37,7 @@ class DatabaseSessionManager:
     @contextlib.asynccontextmanager
     async def connect(self) -> AsyncIterator[AsyncConnection]:
         if self._engine is None:
-            raise Exception("Database Sessino Manager is not initialized")
+            raise Exception("Database Session Manager is not initialized")
 
         async with self._engine.begin() as connection:
             try:
@@ -49,19 +49,19 @@ class DatabaseSessionManager:
     @contextlib.asynccontextmanager
     async def session(self) -> AsyncIterator[AsyncConnection]:
         if self._sessionmaker is None:
-            raise Exception("DatabaseSessionManager is not initialized")
+            raise Exception("Database Session Manager is not initialized")
 
         session = self._sessionmaker()
         try:
             yield session
-            yield session.commit()
+            await session.commit()
         except Exception:
             await session.rollback()
             raise
         finally:
             await session.close()
 
-    # used for testing
+    # For testing purposes
     async def create_all(self, connection: AsyncConnection):
         await connection.run_sync(Base.metadata.create_all)
 
@@ -73,11 +73,10 @@ database_url = getenv("DATABASE_URL")
 if not database_url:
     raise Exception("Database URL is not set in the environment")
 
-
-sessionmaker = DatabaseSessionManager()
-sessionmaker.init(database_url)  ##missing config
+session_manager = DatabaseSessionManager()
+session_manager.init(database_url)  # Use the configured database URL
 
 
 async def get_db():
-    async with sessionmaker.session() as session:
+    async with session_manager.session() as session:
         yield session

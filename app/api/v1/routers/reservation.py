@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from app.api.models import Reservation
@@ -36,7 +37,7 @@ async def read_reservations(db: Session = Depends(get_db)):
 
 
 @router.get("/{reservation_id}", response_model=schemas.ReservationSchema)
-async def read_reservation(reservation_id: int, db: Session = Depends(get_db)):
+async def read_reservation(reservation_id: int, db: AsyncSession = Depends(get_db)):
     try:
         reservation = Reservation.get(db, id=reservation_id)
         return await reservation

@@ -53,7 +53,7 @@ class Conference(BaseModelMixin, Base):
         "Lecture", back_populates="conference", cascade="all, delete, delete-orphan"
     )
 
-    reservation: Mapped[List["Reservation"]] = relationship(
+    reservations: Mapped[List["Reservation"]] = relationship(
         "Reservation", back_populates="conference", cascade="all, delete, delete-orphan"
     )
 
