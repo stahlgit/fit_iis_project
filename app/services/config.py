@@ -1,6 +1,8 @@
 import os
 
-from fastapi import WebSocket
+from decouple import config
+from fastapi_jwt_auth import AuthJWT
+from pydantic import BaseModel
 
 
 class Config:
@@ -15,5 +17,14 @@ class Config:
         ),
     )
 
+    JWT_SECRET_KEY = config("JWT_SECRET_KEY", default="your_default_secret_key")
 
-config = Config
+
+# JWT Settings
+class Settings(BaseModel):
+    authjwt_secret_key: str = Config.JWT_SECRET_KEY
+
+
+@AuthJWT.load_config
+def get_config():
+    return Settings()

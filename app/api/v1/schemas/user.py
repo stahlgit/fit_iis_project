@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 from app.api.v1 import schemas as schemas
 
@@ -21,6 +21,13 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
+    name: str
+    email: EmailStr
+    password: Optional[str] = None
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
     password: str
 
 

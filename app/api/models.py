@@ -2,6 +2,7 @@ import enum
 from decimal import Decimal
 from typing import List, Optional
 
+from passlib.context import CryptContext
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
@@ -23,6 +24,8 @@ from app.api.base import (
     CreateException,
     MissingRequiredFieldException,
 )
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserRole(enum.Enum):
@@ -73,7 +76,8 @@ class User(BaseModelMixin, Base):
     role: Mapped[Optional[str]] = mapped_column(
         Enum(UserRole), nullable=False, default=UserRole.GUEST
     )
-    # TODO password hashing
+
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)  # TODO migrate
 
     lectures: Mapped[List["Lecture"]] = relationship(
         "Lecture",
@@ -93,6 +97,12 @@ class User(BaseModelMixin, Base):
     given_presentations: Mapped[List["GivenPresentation"]] = relationship(
         "GivenPresentation", back_populates="user"
     )
+
+    def set_password(self, password: str):
+        self.hashed_password = pwd_context.hash(password)
+
+    def verify_password(self, password: str):
+        return pwd_context.verify(password, self.hashed_password)
 
 
 class Room(BaseModelMixin, Base):

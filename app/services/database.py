@@ -74,7 +74,7 @@ if not database_url:
     raise Exception("Database URL is not set in the environment")
 
 session_manager = DatabaseSessionManager()
-session_manager.init(database_url)  # Use the configured database URL
+session_manager.init(database_url)
 
 
 async def get_db():
