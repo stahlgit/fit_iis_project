@@ -1,6 +1,0 @@
-- add authentication & authorization
-- validaiton and error handling
-- API documentation
-- logging and monitoring
-- tests
-- better schemas

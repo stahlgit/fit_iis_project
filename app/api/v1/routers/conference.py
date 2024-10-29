@@ -31,7 +31,7 @@ async def create_conference(
 
 
 @router.get("/all", response_model=List[schemas.ConferenceCreate])
-async def read_conferences(db: Session = Depends(get_db)):
+async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit
     try:
         return await Conference.get_all(db)
     except Exception as e:
