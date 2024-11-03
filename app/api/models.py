@@ -1,4 +1,5 @@
 import enum
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -14,7 +15,6 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import TSTZRANGE
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.api.base import (
@@ -40,9 +40,10 @@ class Conference(BaseModelMixin, Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     genre: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     place: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    time_interval: Mapped[Optional[TSTZRANGE]] = mapped_column(
-        "time_interval", TSTZRANGE, nullable=False
-    )
+
+    start_time: Mapped[Optional[datetime]] = mapped_column("start_time", nullable=False)
+    end_time: Mapped[Optional[datetime]] = mapped_column("end_time", nullable=False)
+
     # TIME TO // TIME FROM ?
     price: Mapped[Optional[Float]] = mapped_column(Float, nullable=True)
     capacity: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
@@ -161,7 +162,8 @@ class Lecture(BaseModelMixin, Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    time_interval: Mapped[TSTZRANGE] = mapped_column(TSTZRANGE, nullable=True)
+    start_time: Mapped[Optional[datetime]] = mapped_column("start_time", nullable=False)
+    end_time: Mapped[Optional[datetime]] = mapped_column("end_time", nullable=False)
 
     tags: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     image: Mapped[Optional[str]] = mapped_column(String, nullable=True)
