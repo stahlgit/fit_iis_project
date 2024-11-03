@@ -41,10 +41,11 @@ async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit
 @router.get("/{conference_id}", response_model=schemas.ConferenceCreate)
 async def read_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
-        conference = Conference.get(db, id=conference_id)
-        return await conference
-    except conference.DoesNotExist:
-        not_found("Conference")
+        conference = await Conference.get(conference_id, session=db)
+        if not conference:
+            not_found("Conference")
+        return schemas.ConferenceCreate(**conference.__dict__)
+
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
