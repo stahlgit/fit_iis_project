@@ -13,7 +13,8 @@ class ConferenceBase(BaseModel):
     description: Optional[str] = None
     genre: Optional[str] = None
     place: Optional[str] = None
-    time_interval: Optional[tuple[datetime, datetime]] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
     price: Optional[float] = None
     capacity: Optional[int] = None
 

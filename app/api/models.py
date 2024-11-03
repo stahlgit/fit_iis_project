@@ -44,7 +44,6 @@ class Conference(BaseModelMixin, Base):
     start_time: Mapped[Optional[datetime]] = mapped_column("start_time", nullable=False)
     end_time: Mapped[Optional[datetime]] = mapped_column("end_time", nullable=False)
 
-    # TIME TO // TIME FROM ?
     price: Mapped[Optional[Float]] = mapped_column(Float, nullable=True)
     capacity: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
@@ -62,6 +61,10 @@ class Conference(BaseModelMixin, Base):
         "GivenPresentation",
         back_populates="conference"
         ## track history ???
+    )
+
+    __table_args__ = (
+        CheckConstraint("start_time < end_time", name="Correct_time_sequence"),
     )
 
 
@@ -188,6 +191,10 @@ class Lecture(BaseModelMixin, Base):
 
     questions: Mapped[List["Question"]] = relationship(
         "Question", back_populates="lecture", cascade="all, delete, delete-orphan"
+    )
+
+    __table_args__ = (
+        CheckConstraint("start_time < end_time", name="Correct_time_sequence"),
     )
 
 

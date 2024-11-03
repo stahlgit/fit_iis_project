@@ -22,10 +22,10 @@ async def create_conference(
     conference_in: schemas.ConferenceCreate, db: Session = Depends(get_db)
 ):
     try:
-        existing_conference = Conference.get_by(name=conference_in.name)
+        existing_conference = await Conference.get_by(db, name=conference_in.name)
         if existing_conference:
             raise HTTPException(status_code=400, detail="Conference already registered")
-        return await Conference.create(db, conference_in)
+        return await Conference.create(db, **conference_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
