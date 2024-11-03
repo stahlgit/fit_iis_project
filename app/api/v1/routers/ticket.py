@@ -22,7 +22,9 @@ async def create_ticket(
     ticket_in: schemas.TicketCreateSchema, db: Session = Depends(get_db)
 ):
     try:
-        return await Ticket.create(db, ticket_in)
+        if await Ticket.get_by(db, name=ticket_in.name):
+            raise HTTPException(status_code=400, detail="Ticket already registered")
+        return await Ticket.create(db, **ticket_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -38,10 +40,10 @@ async def read_tickets(db: Session = Depends(get_db)):
 @router.get("/{ticket_id}", response_model=schemas.TicketSchema)
 async def read_ticket(ticket_id: int, db: Session = Depends(get_db)):
     try:
-        ticket = Ticket.get(db, id=ticket_id)
-        return await ticket
-    except ticket.DoesNotExist:
-        not_found("Ticket")
+        ticket = Ticket.get(ticket_id, session=db)
+        if not ticket:
+            not_found("Ticket")
+        return schemas.TicketSchema(**ticket.__dict__)
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -51,8 +53,8 @@ async def update_ticket(
     ticket_id: int, ticket_in: schemas.TicketUpdateSchema, db: Session = Depends(get_db)
 ):
     try:
-        ticket = Ticket.get(db, id=ticket_id)
-        if ticket is None:
+        ticket = Ticket.get(ticket_id, session=db)
+        if not ticket:
             not_found("Ticket")
         return await Ticket.update(db, id=ticket_id, **ticket_in.model_dump())
     except Exception as e:
@@ -62,8 +64,8 @@ async def update_ticket(
 @router.delete("/{ticket_id}")
 async def delete_ticket(ticket_id: int, db: Session = Depends(get_db)):
     try:
-        ticket = await Ticket.get(db, id=ticket_id)
-        if ticket is None:
+        ticket = Ticket.get(ticket_id, session=db)
+        if not ticket:
             not_found("Ticket")
         await Ticket.delete(db, id=ticket_id)
         return ticket

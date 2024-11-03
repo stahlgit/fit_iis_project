@@ -20,7 +20,9 @@ router = APIRouter(
 )
 async def create_room(room_in: schemas.RoomCreateSchema, db: Session = Depends(get_db)):
     try:
-        return await Room.create(db, room_in)
+        if await Room.get_by(db, name=room_in.name):
+            raise HTTPException(status_code=400, detail="Room already registered")
+        return await Room.create(db, **room_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -36,10 +38,10 @@ async def read_rooms(db: Session = Depends(get_db)):
 @router.get("/{room_id}", response_model=schemas.RoomSchema)
 async def read_room(room_id: int, db: Session = Depends(get_db)):
     try:
-        room = Room.get(db, id=room_id)
-        return await room
-    except room.DoesNotExist:
-        not_found("Room")
+        room = await Room.get(room_id, session=db)
+        if not room:
+            not_found("Room")
+        return schemas.RoomSchema(**room.__dict__)
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -49,8 +51,8 @@ async def update_room(
     room_id: int, room_in: schemas.RoomUpdateSchema, db: Session = Depends(get_db)
 ):
     try:
-        room = Room.get(db, id=room_id)
-        if room is None:
+        room = await Room.get(room_id, session=db)
+        if not room:
             not_found("Room")
         return await Room.update(db, id=room_id, **room_in.model_dump())
     except Exception as e:
@@ -60,7 +62,7 @@ async def update_room(
 @router.delete("/{room_id}")
 async def delete_room(room_id: int, db: Session = Depends(get_db)):
     try:
-        room = await Room.get(db, id=room_id)
+        room = await Room.get(room_id, session=db)
         if room is None:
             not_found("Room")
         await Room.delete(db, id=room_id)

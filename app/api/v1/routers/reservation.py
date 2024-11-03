@@ -23,7 +23,11 @@ async def create_reservation(
     reservation_in: schemas.ReservationCreateSchema, db: Session = Depends(get_db)
 ):
     try:
-        return await Reservation.create(db, reservation_in)
+        if await Reservation.get_by(db, name=reservation_in.name):
+            raise HTTPException(
+                status_code=400, detail="Reservation already registered"
+            )
+        return await Reservation.create(db, **reservation_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -39,10 +43,10 @@ async def read_reservations(db: Session = Depends(get_db)):
 @router.get("/{reservation_id}", response_model=schemas.ReservationSchema)
 async def read_reservation(reservation_id: int, db: AsyncSession = Depends(get_db)):
     try:
-        reservation = Reservation.get(db, id=reservation_id)
-        return await reservation
-    except reservation.DoesNotExist:
-        not_found("Reservation")
+        reservation = await Reservation.get(reservation_id, session=db)
+        if not reservation:
+            not_found("Reservation")
+        return schemas.ReservationSchema(**reservation.__dict__)
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -54,12 +58,10 @@ async def update_reservation(
     db: Session = Depends(get_db),
 ):
     try:
-        reservation = Reservation.get(db, id=reservation_id)
-        if reservation is None:
+        reservation = await Reservation.get(reservation_id, session=db)
+        if not reservation:
             not_found("Reservation")
-        return await Reservation.update(
-            db, id=reservation_id, **reservation_in.model_dump()
-        )
+        return Reservation.update(db, id=reservation_id, **reservation_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
@@ -67,8 +69,8 @@ async def update_reservation(
 @router.delete("/{reservation_id}")
 async def delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
     try:
-        reservation = await Reservation.get(db, id=reservation_id)
-        if reservation is None:
+        reservation = await Reservation.get(reservation_id, session=db)
+        if not reservation:
             not_found("Reservation")
         await Reservation.delete(db, id=reservation_id)
         return reservation

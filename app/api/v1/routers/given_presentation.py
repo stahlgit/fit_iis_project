@@ -24,7 +24,11 @@ async def create_given_presentation(
     given_in: schemas.GivenPresentationCreateSchema, db: Session = Depends(get_db)
 ):
     try:
-        return await GivenPresentation.create(db, given_in)
+        if await GivenPresentation.get_by(db, name=given_in.name):
+            raise HTTPException(
+                status_code=400, detail="Given Presentation already registered"
+            )
+        return await GivenPresentation.create(db, **given_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -42,10 +46,11 @@ async def read_given_presentations(
 @router.get("/{given_id}", response_model=schemas.GivenPresentationCreateSchema)
 async def read_given_presentation(given_id: int, db: Session = Depends(get_db)):
     try:
-        given_presentation = GivenPresentation.get(db, id=given_id)
-        return await given_presentation
-    except given_presentation.DoesNotExist:
-        not_found("Given Presentation")
+        given_presentation = await GivenPresentation.get(given_id, session=db)
+        if not given_presentation:
+            not_found("Given Presentation")
+        return schemas.GivenPresentationSchema(**given_presentation.__dict__)
+
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -57,8 +62,8 @@ async def update_given_presentation(
     db: Session = Depends(get_db),
 ):
     try:
-        given_presentation = GivenPresentation.get(db, id=given_id)
-        if given_presentation is None:
+        given_presentation = await GivenPresentation.get(given_id, session=db)
+        if not given_presentation:
             not_found("Given Presentation")
         return await GivenPresentation.update(db, id=given_id, **given_in.model_dump())
     except Exception as e:
@@ -68,8 +73,8 @@ async def update_given_presentation(
 @router.delete("/{given_id}")
 async def delete_given_presentation(given_id: int, db: Session = Depends(get_db)):
     try:
-        given_presentation = await GivenPresentation.get(db, id=given_id)
-        if given_presentation is None:
+        given_presentation = await GivenPresentation.get(given_id, session=db)
+        if not given_presentation:
             not_found("Given Presentation")
         await GivenPresentation.delete(db, id=given_id)
         return given_presentation

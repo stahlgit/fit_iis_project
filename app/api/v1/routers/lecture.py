@@ -22,7 +22,9 @@ async def create_lecture(
     lecture_in: schemas.LectureCreateSchema, db: Session = Depends(get_db)
 ):
     try:
-        return await Lecture.create(db, lecture_in)
+        if await Lecture.get_by(db, name=lecture_in.name):
+            raise HTTPException(status_code=400, detail="Lecture already registered")
+        return await Lecture.create(db, **lecture_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -38,10 +40,10 @@ async def read_lectures(db: Session = Depends(get_db)):
 @router.get("/{lecture_id}", response_model=schemas.LectureSchema)
 async def read_lecture(lecture_id: int, db: Session = Depends(get_db)):
     try:
-        lecture = Lecture.get(db, id=lecture_id)
-        return await lecture
-    except lecture.DoesNotExist:
-        not_found("Lecture")
+        lecture = await Lecture.get(lecture_id, sesion=db)
+        if not lecture:
+            not_found("Lecture")
+        return schemas.LectureSchema(**lecture.__dict__)
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -53,8 +55,8 @@ async def update_lecture(
     db: Session = Depends(get_db),
 ):
     try:
-        lecture = Lecture.get(db, id=lecture_id)
-        if lecture is None:
+        lecture = await Lecture.get(lecture_id, sesion=db)
+        if not lecture:
             not_found("Lecture")
         return await Lecture.update(db, id=lecture_id, **lecture_in.model_dump())
     except Exception as e:
@@ -64,8 +66,8 @@ async def update_lecture(
 @router.delete("/{lecture_id}")
 async def delete_lecture(lecture_id: int, db: Session = Depends(get_db)):
     try:
-        lecture = await Lecture.get(db, id=lecture_id)
-        if lecture is None:
+        lecture = await Lecture.get(lecture_id, sesion=db)
+        if not lecture:
             not_found("Lecture")
         await Lecture.delete(db, id=lecture_id)
         return lecture

@@ -22,7 +22,9 @@ async def create_question(
     question_in: schemas.QuestionCreateSchema, db: Session = Depends(get_db)
 ):
     try:
-        return await Question.create(db, question_in)
+        if await Question.get_by(db, name=question_in.name):
+            raise HTTPException(status_code=400, detail="Question already registered")
+        return await Question.create(db, **question_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -38,10 +40,10 @@ async def read_questions(db: Session = Depends(get_db)):
 @router.get("/{question_id}", response_model=schemas.QuestionSchema)
 async def read_question(question_id: int, db: Session = Depends(get_db)):
     try:
-        question = Question.get(db, id=question_id)
-        return await question
-    except question.DoesNotExist:
-        not_found("Question")
+        question = await Question.get(question_id, session=db)
+        if not question:
+            not_found("Question")
+        return schemas.QuestionSchema(**question.__dict__)
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -53,8 +55,8 @@ async def update_question(
     db: Session = Depends(get_db),
 ):
     try:
-        question = Question.get(db, id=question_id)
-        if question is None:
+        question = await Question.get(question_id, session=db)
+        if not question:
             not_found("Reservation")
         return await Question.update(db, id=question_id, **question_in.model_dump())
     except Exception as e:
@@ -64,8 +66,8 @@ async def update_question(
 @router.delete("/{question_id}")
 async def delete_lecture(question_id: int, db: Session = Depends(get_db)):
     try:
-        question = await Question.get(db, id=question_id)
-        if question is None:
+        question = await Question.get(question_id, session=db)
+        if not question:
             not_found("Reservation")
         await Question.delete(db, id=question_id)
         return question
