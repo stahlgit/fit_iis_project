@@ -6,9 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.api.models import Reservation
 from app.api.v1.schemas import reservation as schemas
-from app.services.database import get_db
-from app.services.logging import log_endpoint
-from app.services.utils import not_found
+from app.services import get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/reservation",

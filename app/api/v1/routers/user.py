@@ -5,8 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.models import User
 from app.api.v1.schemas import user as schemas
-from app.services.database import get_db
-from app.services.utils import not_found
+from app.services import get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/user",
