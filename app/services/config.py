@@ -1,7 +1,5 @@
 import os
 
-from fastapi import WebSocket
-
 
 class Config:
     DB_CONFIG = os.getenv(

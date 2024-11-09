@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.models import Lecture
 from app.api.v1.schemas import lecture as schemas
 from app.services.database import get_db
+from app.services.logging import log_endpoint
 from app.services.utils import not_found
 
 router = APIRouter(
@@ -18,6 +19,7 @@ router = APIRouter(
 @router.post(
     "/", response_model=schemas.LectureSchema, status_code=status.HTTP_201_CREATED
 )
+@log_endpoint
 async def create_lecture(
     lecture_in: schemas.LectureCreateSchema, db: Session = Depends(get_db)
 ):
@@ -30,6 +32,7 @@ async def create_lecture(
 
 
 @router.get("/all", response_model=List[schemas.LectureSchema])
+@log_endpoint
 async def read_lectures(db: Session = Depends(get_db)):
     try:
         return await Lecture.get_all(db)
@@ -38,6 +41,7 @@ async def read_lectures(db: Session = Depends(get_db)):
 
 
 @router.get("/{lecture_id}", response_model=schemas.LectureSchema)
+@log_endpoint
 async def read_lecture(lecture_id: int, db: Session = Depends(get_db)):
     try:
         lecture = await Lecture.get(lecture_id, sesion=db)
@@ -49,6 +53,7 @@ async def read_lecture(lecture_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{lecture_id}", response_model=schemas.LectureUpdateSchema)
+@log_endpoint
 async def update_lecture(
     lecture_id: int,
     lecture_in: schemas.LectureUpdateSchema,
@@ -64,6 +69,7 @@ async def update_lecture(
 
 
 @router.delete("/{lecture_id}")
+@log_endpoint
 async def delete_lecture(lecture_id: int, db: Session = Depends(get_db)):
     try:
         lecture = await Lecture.get(lecture_id, sesion=db)

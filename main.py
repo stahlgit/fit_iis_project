@@ -1,17 +1,12 @@
 import importlib
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 app = FastAPI(
     title="FIT ISS PROJECT API",
     version="0.1",
 )
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World!"}
 
 
 directory = "app/api/v1/routers"
@@ -23,3 +18,8 @@ for filename in os.listdir(directory):
             directory.replace("/", ".") + "." + module_name, package=None
         )
         app.include_router(module.router)
+
+
+@app.get("/")
+def read_root():
+    return Response(status_code=200)

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.models import Voting
 from app.api.v1.schemas import voting as schemas
 from app.services.database import get_db
+from app.services.logging import log_endpoint
 from app.services.utils import not_found
 
 router = APIRouter(
@@ -18,6 +19,7 @@ router = APIRouter(
 @router.post(
     "/", response_model=schemas.VotingSchema, status_code=status.HTTP_201_CREATED
 )
+@log_endpoint
 async def create_voting(
     voting_in: schemas.VotingCreateSchema, db: Session = Depends(get_db)
 ):
@@ -30,6 +32,7 @@ async def create_voting(
 
 
 @router.get("/all", response_model=List[schemas.VotingSchema])
+@log_endpoint
 async def read_votings(db: Session = Depends(get_db)):
     try:
         return await Voting.get_all(db)
@@ -38,6 +41,7 @@ async def read_votings(db: Session = Depends(get_db)):
 
 
 @router.get("/{voting_id}", response_model=schemas.VotingSchema)
+@log_endpoint
 async def read_voting(voting_id: int, db: Session = Depends(get_db)):
     try:
         voting = Voting.get(voting_id, session=db)
@@ -49,6 +53,7 @@ async def read_voting(voting_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{voting_id}", response_model=schemas.VotingUpdateSchema)
+@log_endpoint
 async def update_voting(
     voting_id: int, voting_in: schemas.VotingUpdateSchema, db: Session = Depends(get_db)
 ):
@@ -62,6 +67,7 @@ async def update_voting(
 
 
 @router.delete("/{voting_id}")
+@log_endpoint
 async def delete_voting(voting_id: int, db: Session = Depends(get_db)):
     try:
         voting = Voting.get(voting_id, session=db)

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.models import Ticket
 from app.api.v1.schemas import ticket as schemas
 from app.services.database import get_db
+from app.services.logging import log_endpoint
 from app.services.utils import not_found
 
 router = APIRouter(
@@ -18,6 +19,7 @@ router = APIRouter(
 @router.post(
     "/", response_model=schemas.TicketSchema, status_code=status.HTTP_201_CREATED
 )
+@log_endpoint
 async def create_ticket(
     ticket_in: schemas.TicketCreateSchema, db: Session = Depends(get_db)
 ):
@@ -30,6 +32,7 @@ async def create_ticket(
 
 
 @router.get("/all", response_model=List[schemas.TicketSchema])
+@log_endpoint
 async def read_tickets(db: Session = Depends(get_db)):
     try:
         return await Ticket.get_all(db)
@@ -38,6 +41,7 @@ async def read_tickets(db: Session = Depends(get_db)):
 
 
 @router.get("/{ticket_id}", response_model=schemas.TicketSchema)
+@log_endpoint
 async def read_ticket(ticket_id: int, db: Session = Depends(get_db)):
     try:
         ticket = Ticket.get(ticket_id, session=db)
@@ -49,6 +53,7 @@ async def read_ticket(ticket_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{ticket_id}", response_model=schemas.TicketUpdateSchema)
+@log_endpoint
 async def update_ticket(
     ticket_id: int, ticket_in: schemas.TicketUpdateSchema, db: Session = Depends(get_db)
 ):
@@ -62,6 +67,7 @@ async def update_ticket(
 
 
 @router.delete("/{ticket_id}")
+@log_endpoint
 async def delete_ticket(ticket_id: int, db: Session = Depends(get_db)):
     try:
         ticket = Ticket.get(ticket_id, session=db)

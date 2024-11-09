@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.models import Conference
 from app.api.v1.schemas import conference as schemas
 from app.services.database import get_db
+from app.services.logging import log_endpoint
 from app.services.utils import not_found
 
 router = APIRouter(
@@ -18,6 +19,7 @@ router = APIRouter(
 @router.post(
     "/", response_model=schemas.ConferenceCreate, status_code=status.HTTP_201_CREATED
 )
+@log_endpoint
 async def create_conference(
     conference_in: schemas.ConferenceCreate, db: Session = Depends(get_db)
 ):
@@ -30,7 +32,8 @@ async def create_conference(
 
 
 @router.get("/all", response_model=List[schemas.ConferenceSchema])
-async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit
+@log_endpoint
+async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit ?
     try:
         return await Conference.get_all(db)
     except Exception as e:
@@ -38,6 +41,7 @@ async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit
 
 
 @router.get("/{conference_id}", response_model=schemas.ConferenceSchema)
+@log_endpoint
 async def read_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
         conference = await Conference.get(conference_id, session=db)
@@ -50,6 +54,7 @@ async def read_conference(conference_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{conference_id}", response_model=schemas.ConferenceUpdate)
+@log_endpoint
 async def update_conference(
     conference_id: int,
     conference_in: schemas.ConferenceUpdate,
@@ -67,6 +72,7 @@ async def update_conference(
 
 
 @router.delete("/{conference_id}")
+@log_endpoint
 async def delete_conference(conference_id: int, db: Session = Depends(get_db)):
     try:
         conference = await Conference.get(conference_id, session=db)

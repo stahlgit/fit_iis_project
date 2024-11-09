@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.api.models import Reservation
 from app.api.v1.schemas import reservation as schemas
 from app.services.database import get_db
+from app.services.logging import log_endpoint
 from app.services.utils import not_found
 
 router = APIRouter(
@@ -19,6 +20,7 @@ router = APIRouter(
 @router.post(
     "/", response_model=schemas.ReservationSchema, status_code=status.HTTP_201_CREATED
 )
+@log_endpoint
 async def create_reservation(
     reservation_in: schemas.ReservationCreateSchema, db: Session = Depends(get_db)
 ):
@@ -33,6 +35,7 @@ async def create_reservation(
 
 
 @router.get("/all", response_model=List[schemas.ReservationSchema])
+@log_endpoint
 async def read_reservations(db: Session = Depends(get_db)):
     try:
         return await Reservation.get_all(db)
@@ -41,6 +44,7 @@ async def read_reservations(db: Session = Depends(get_db)):
 
 
 @router.get("/{reservation_id}", response_model=schemas.ReservationSchema)
+@log_endpoint
 async def read_reservation(reservation_id: int, db: AsyncSession = Depends(get_db)):
     try:
         reservation = await Reservation.get(reservation_id, session=db)
@@ -52,6 +56,7 @@ async def read_reservation(reservation_id: int, db: AsyncSession = Depends(get_d
 
 
 @router.put("/{reservation_id}", response_model=schemas.ReservationUpdateSchema)
+@log_endpoint
 async def update_reservation(
     reservation_id: int,
     reservation_in: schemas.ReservationUpdateSchema,
@@ -67,6 +72,7 @@ async def update_reservation(
 
 
 @router.delete("/{reservation_id}")
+@log_endpoint
 async def delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
     try:
         reservation = await Reservation.get(reservation_id, session=db)
