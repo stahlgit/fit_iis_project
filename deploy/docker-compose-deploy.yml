@@ -20,4 +20,25 @@ services:
     networks:
       - iis_network
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/{POSTGRES_DB} # Use this to connect to the db service
+      DATABASE_URL: ${DB_DEPLOY}
+
+  prometheus:
+    image: prom/prometheus
+    container_name: iis_prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - iis_network
+
+  postgresql_exporter:
+    image: prom/postgresql_exporter
+    container_name: iis_postgresql_exporter
+    environment:
+      DATA_SOURCE_NAME: ${DB_DEPLOY}
+    networks:
+      - iis_network
+    depends_on:
+      db:
+        condition: service_healthy

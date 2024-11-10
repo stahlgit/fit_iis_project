@@ -2,11 +2,14 @@ import importlib
 import os
 
 from fastapi import FastAPI, Response
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI(
     title="FIT ISS PROJECT API",
     version="0.1",
 )
+
+Instrumentator().instrument(app).expose(app)
 
 
 directory = "app/api/v1/routers"
