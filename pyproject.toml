@@ -13,6 +13,10 @@ uvicorn = "^0.30.6"
 alembic = "^1.13.3"
 psycopg = {extras = ["async"], version = "^3.2.3"}
 python-dotenv = "^1.0.1"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pycryptodome = "^3.21.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-multipart = "^0.0.17"
 
 
 

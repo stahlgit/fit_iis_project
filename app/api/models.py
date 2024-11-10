@@ -77,7 +77,9 @@ class User(BaseModelMixin, Base):
     role: Mapped[Optional[str]] = mapped_column(
         Enum(UserRole), nullable=False, default=UserRole.GUEST
     )
-    # TODO password hashing
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     lectures: Mapped[List["Lecture"]] = relationship(
         "Lecture",
