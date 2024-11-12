@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.models import User
 from app.api.v1.schemas.user import UserCreate, UserRoleEnum, UserUpdate
 from app.services import config, get_db, get_password_hash, verify_password
+from app.services.utils import not_found
 
 
 async def register_user(user_in: UserCreate, db: Session) -> User:
@@ -56,10 +57,10 @@ async def get_current_user(
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
         user_id = payload.get("sub")
         if user_id is None:
-            raise HTTPException(status_code=404, detail="User not found")
+            not_found("User")
         user = User.get_by(db, id=user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            not_found("User")
         return user
     except JWTError:
         raise HTTPException(status_code=403, detail="Could not validate credentials")
@@ -71,3 +72,12 @@ async def get_admin(current_user: User = Depends(get_current_user)) -> User:
     if current_user.role != UserRoleEnum.ADMIN:
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
+
+
+async def set_role(
+    user_id: int, new_role: UserRoleEnum, db: Session = Depends(get_db)
+) -> User:
+    user = await User.get_by(db, id=user_id)
+    if not user:
+        not_found("User")
+    return await User.update(db, id=user_id, role=new_role)

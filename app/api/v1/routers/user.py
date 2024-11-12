@@ -51,3 +51,21 @@ async def login_for_access_token(
 @log_endpoint
 async def read_users_me(current_user: User = Depends(crud.get_current_user)):
     return current_user
+
+
+@router.post("{/user_id}/   ", response_model=schemas.UserSchema)
+@log_endpoint
+async def set_user_role(
+    user_id: int,
+    new_role: schemas.UserRoleEnum,
+    admin_user=Depends(crud.get_admin),
+    db: Session = Depends(get_db),
+):
+    if not admin_user:
+        raise HTTPException(status_code=401, detail="Admin access required")
+    user = await crud.set_user_role(user_id, new_role, db)
+    if not user:
+        raise HTTPException(
+            status_code=400, detail="Error occured while setting user role"
+        )
+    return user
