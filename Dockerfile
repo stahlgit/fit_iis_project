@@ -12,10 +12,16 @@ ENV \
     POETRY_HOME="/opt/poetry" \
     POETRY_NO_INTERACTION=1 \
     POETRY_VERSION=1.5.1
-    
+
 EXPOSE 8000
-    
+
 WORKDIR /fit_iis
+
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libpq-dev \
+    postgresql-dev
 
 # Poetry Setup
 COPY poetry.lock pyproject.toml ./
@@ -24,4 +30,4 @@ RUN poetry export --output requirements.txt
 RUN pip install --no-deps -r requirements.txt
 
 
-COPY . . 
+COPY . .

@@ -20,7 +20,7 @@ services:
     networks:
       - iis_network
     environment:
-      DATABASE_URL: ${DB_DEPLOY}
+      DATABASE_URL: ${DOCKER_URL}
 
   prometheus:
     image: prom/prometheus
@@ -31,14 +31,5 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - iis_network
-
-  postgresql_exporter:
-    image: prom/postgresql_exporter
-    container_name: iis_postgresql_exporter
-    environment:
-      DATA_SOURCE_NAME: ${DB_DEPLOY}
-    networks:
-      - iis_network
-    depends_on:
-      db:
-        condition: service_healthy
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
