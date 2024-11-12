@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from app.api.models import User
-from app.api.v1.schemas.user import UserCreate, UserUpdate
+from app.api.v1.schemas.user import UserCreate, UserRoleEnum, UserUpdate
 from app.services import config, get_db, get_password_hash, verify_password
 
 
@@ -58,3 +58,9 @@ async def get_current_user(
         raise HTTPException(status_code=403, detail="Could not validate credentials")
     except Exception as e:
         raise HTTPException(status_code=403, detail=f"Error occured: {e}")
+
+
+async def get_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != UserRoleEnum.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
