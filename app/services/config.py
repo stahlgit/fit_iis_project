@@ -1,6 +1,11 @@
 import os
 
+from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
+
+load_dotenv()
 
 
 class Config:
@@ -16,10 +21,10 @@ class Config:
     )
 
     SECRET_KEY = os.getenv("SECRET_KEY")
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     ALGORITHM = os.getenv("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+    # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 
 
 config = Config

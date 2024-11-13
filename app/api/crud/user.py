@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
@@ -7,7 +7,13 @@ from sqlalchemy.orm import Session
 
 from app.api.models import User, UserRole
 from app.api.v1.schemas.user import UserCreate, UserUpdate
-from app.services import config, get_db, get_password_hash, verify_password
+from app.services import (
+    config,
+    get_db,
+    get_password_hash,
+    oauth2_scheme,
+    verify_password,
+)
 from app.services.utils import not_found
 
 
@@ -31,7 +37,7 @@ async def authenticate_user(
     db: Session = Depends(get_db),
 ) -> Optional[User]:
     try:
-        user = User.get_by(db, name=username)
+        user = await User.get_one_by(db, name=username)
         ## password je input od usera
         ## hashed password je z DB
         if not user:
@@ -47,15 +53,13 @@ async def authenticate_user(
 
 async def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + datetime.timedelta(
-        minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES
-    )
+    expire = datetime.now() + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})  # Add expiry to token payload
-    return jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
+    return jwt.encode(to_encode, config.JWT_SECRET_KEY, algorithm=config.ALGORITHM)
 
 
 async def get_current_user(
-    token: str = Depends(config.oauth2_scheme), db: Session = Depends(get_db)
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:
     try:
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])

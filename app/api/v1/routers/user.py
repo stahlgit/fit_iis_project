@@ -53,7 +53,7 @@ async def read_users_me(current_user: User = Depends(crud.get_current_user)):
     return current_user
 
 
-@router.post("{/user_id}/   ", response_model=schemas.UserSchema)
+@router.post("{/user_id}/", response_model=schemas.UserSchema)
 @log_endpoint
 async def set_user_role(
     user_id: int,
@@ -63,9 +63,29 @@ async def set_user_role(
 ):
     if not admin_user:
         raise HTTPException(status_code=401, detail="Admin access required")
-    user = await crud.set_user_role(user_id, new_role, db)
+    user = await crud.set_role(user_id, new_role, db)
     if not user:
         raise HTTPException(
             status_code=400, detail="Error occured while setting user role"
         )
     return user
+
+
+@router.post("{user_id}/set_admin", response_model=schemas.UserSchema)
+@log_endpoint
+async def set_admin(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    user = await crud.set_role(user_id, UserRole.ADMIN, db)
+    if not user:
+        raise HTTPException(
+            status_code=400, detail="Error occured while setting user role"
+        )
+    return user
+
+
+@router.post("/logout")
+@log_endpoint
+async def logout():
+    return {"message": "User logged out"}
