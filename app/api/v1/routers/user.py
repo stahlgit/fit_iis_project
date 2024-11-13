@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.api.crud import user as crud
-from app.api.models import User
+from app.api.models import User, UserRole
 from app.api.v1.schemas import user as schemas
 from app.services import config, get_db, log_endpoint
 
@@ -31,7 +31,7 @@ async def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_d
         raise HTTPException(400, f"Error occured: {e}")
 
 
-@router.post("token", response_model=schemas.Token)
+@router.post("/token", response_model=schemas.Token)
 @log_endpoint
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
@@ -57,7 +57,7 @@ async def read_users_me(current_user: User = Depends(crud.get_current_user)):
 @log_endpoint
 async def set_user_role(
     user_id: int,
-    new_role: schemas.UserRoleEnum,
+    new_role: UserRole,
     admin_user=Depends(crud.get_admin),
     db: Session = Depends(get_db),
 ):

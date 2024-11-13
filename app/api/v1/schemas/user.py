@@ -5,19 +5,14 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from app.api.models import UserRole
 from app.api.v1 import schemas as schemas
-
-
-class UserRoleEnum(str, Enum):
-    ADMIN = "admin"
-    REGISTERED = "registered"
-    GUEST = "guest"
 
 
 class UserBase(BaseModel):
     name: str
     email: str
-    role: UserRoleEnum = UserRoleEnum.GUEST
+    role: UserRole
 
 
 class UserCreate(UserBase):
