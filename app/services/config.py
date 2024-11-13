@@ -20,11 +20,9 @@ class Config:
         ),
     )
 
-    SECRET_KEY = os.getenv("SECRET_KEY")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     ALGORITHM = os.getenv("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES = 60
-    # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 
 
 config = Config

@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -35,7 +37,7 @@ async def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_d
 @log_endpoint
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
+) -> schemas.Token:
     user = await crud.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
@@ -43,14 +45,16 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = await crud.create_access_token(data={"sub": user.id})
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token = await crud.create_access_token(data={"sub": user.name})
+    return schemas.Token(access_token=access_token, token_type="bearer")
 
 
 @router.get("/me", response_model=schemas.UserSchema)
 @log_endpoint
-async def read_users_me(current_user: User = Depends(crud.get_current_user)):
-    return current_user
+async def read_users_me(
+    current_user: Annotated[User, Depends(crud.get_current_active_user)],
+):
+    return schemas.UserSchema.from_orm(current_user)
 
 
 @router.post("{/user_id}/", response_model=schemas.UserSchema)
@@ -71,7 +75,8 @@ async def set_user_role(
     return user
 
 
-@router.post("{user_id}/set_admin", response_model=schemas.UserSchema)
+## THIS WILL BE DELETED LATER
+@router.post("{user_id}/DEVset_admin", response_model=schemas.UserSchema)
 @log_endpoint
 async def set_admin(
     user_id: int,
@@ -83,9 +88,3 @@ async def set_admin(
             status_code=400, detail="Error occured while setting user role"
         )
     return user
-
-
-@router.post("/logout")
-@log_endpoint
-async def logout():
-    return {"message": "User logged out"}
