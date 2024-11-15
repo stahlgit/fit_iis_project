@@ -1,25 +1,35 @@
-name: Deploy to Server
+name: CI/CD
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  checkout-code:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      - name: Formatting Code
+        uses: lgeiger/black-action@v1.0.1
+        with:
+          args: --check .
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.1        
+        uses: webfactory/ssh-agent@v0.8.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
+
       - name: Copy Files to Server
-        run: | 
+        run: |
           rsync -av -L \
               --delete \
               --verbose \
@@ -33,6 +43,4 @@ jobs:
               --exclude='__pycache__' \
               --exclude='.git' \
               --exclude='.env' \
-              . root@164.92.232.11
-      - name: Restart Services (TODO)
-              
+              . root@164.92.232.11:/path/to/project
