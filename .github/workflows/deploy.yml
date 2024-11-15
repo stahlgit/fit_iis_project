@@ -28,6 +28,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Add SSH Key to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 164.92.232.11 >> ~/.ssh/known_hosts
+
       - name: Copy Files to Server
         run: |
           rsync -av -L \
