@@ -1,0 +1,38 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1        
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+      - name: Copy Files to Server
+        run: | 
+          rsync -av -L \
+              --delete \
+              --verbose \
+              --exclude='.venv' \
+              --exclude='*.pyc' \
+              --exclude='*.scss' \
+              --exclude='__*.js' \
+              --exclude='*BUILD' \
+              --exclude='*.jar' \
+              --exclude='*.DS_Store' \
+              --exclude='__pycache__' \
+              --exclude='.git' \
+              --exclude='.env' \
+              . root@164.92.232.11
+      - name: Restart Services (TODO)
+              
