@@ -48,4 +48,4 @@ jobs:
               --exclude='__pycache__' \
               --exclude='.git' \
               --exclude='.env' \
-              . root@164.92.232.11:/path/to/project
+              . root@164.92.232.11:/root/fit_iis_project
