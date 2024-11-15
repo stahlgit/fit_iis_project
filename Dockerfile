@@ -19,15 +19,14 @@ WORKDIR /fit_iis
 
 RUN apk add --no-cache \
     gcc \
-    musl-dev \
     libpq-dev \
+    musl-dev \
     postgresql-dev
 
 # Poetry Setup
 COPY poetry.lock pyproject.toml ./
-RUN pip install "poetry==$POETRY_VERSION"
-RUN poetry export --output requirements.txt
-RUN pip install --no-deps -r requirements.txt
-
+RUN pip install "poetry==$POETRY_VERSION" && \
+    poetry export --output requirements.txt && \
+    pip install --no-deps -r requirements.txt
 
 COPY . .
