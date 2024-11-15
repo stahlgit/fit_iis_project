@@ -17,14 +17,14 @@ jobs:
       - name: Formatting Code
         uses: lgeiger/black-action@v1.0.1
         with:
-          args: --check .
+          args: .
 
   deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.1
+        uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
