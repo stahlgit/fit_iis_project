@@ -33,7 +33,7 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
-          user: ${{ secrets.SERVER_USER }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: 'deploy.tar'
