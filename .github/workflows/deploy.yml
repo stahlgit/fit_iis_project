@@ -38,6 +38,4 @@ jobs:
 
       - name: Copy Files to Server
         run: |
-          rsync -av -L \
-              ${{ github.workspace }}/ \
-              root@164.92.232.11:/root/fit_iis_project
+          rsync -av -L -v ${{ github.workspace }}/ root@164.92.232.11:/root/fit_iis_project
