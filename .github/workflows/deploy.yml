@@ -33,6 +33,9 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H 164.92.232.11 >> ~/.ssh/known_hosts
 
+      - name: Test SSH Connection
+        run: ssh -o StrictHostKeyChecking=no root@164.92.232.11 "echo 'SSH Connection Successful'"
+
       - name: Copy Files to Server
         run: |
           rsync -av -L \
