@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir ../build
           cp -TR . ../build
+          ls -l ../build
           tar -cvf deploy.tar ../build/
 
       - name: Deploy to Server
@@ -37,4 +38,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: 'deploy.tar'
-          target: './folder'
+          target: './fit_iis_project'
