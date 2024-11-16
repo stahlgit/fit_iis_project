@@ -37,5 +37,4 @@ jobs:
         run: ssh -o StrictHostKeyChecking=no root@164.92.232.11 "echo 'SSH Connection Successful'"
 
       - name: Copy Files to Server
-        run: |
-          rsync -av -L -v ${{ github.workspace }}/ root@164.92.232.11:/root/fit_iis_project
+        run: git clone git@github.com:stahlgit/fit_iis_project.git
