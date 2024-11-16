@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Formatting Code
         uses: lgeiger/black-action@v1.0.1
@@ -23,18 +23,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Deploy to Server
+        uses: NIOMIND-srl-sb/deploy-repository-to-server-action@v1.0.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add SSH Key to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H 164.92.232.11 >> ~/.ssh/known_hosts
-
-      - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no root@164.92.232.11 "echo 'SSH Connection Successful'"
-
-      - name: Copy Files to Server
-        run: git clone git@github.com:stahlgit/fit_iis_project.git
+          branch: master
+          server_host: ${{ secrets.SERVER_HOST }}
+          server_user: ${{ secrets.SERVER_USER }}
+          server_password: ${{ secrets.SERVER_PASSWORD }}
+          server_port: 22
+          target_directory: ${{ secrets.TARGET_DIRECTORY }}
+          repo_directory: .
