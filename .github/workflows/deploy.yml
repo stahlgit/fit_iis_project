@@ -23,13 +23,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Run a multi-line script
+        run: |
+          mkdir ../build
+          cp -TR . ../build
+          tar -cvf deploy.tar ../build/
+
       - name: Deploy to Server
-        uses: NIOMIND-srl-sb/deploy-repository-to-server-action@v1.0.0
+        uses: appleboy/scp-action@master
         with:
-          branch: master
-          server_host: ${{ secrets.SERVER_HOST }}
-          server_user: ${{ secrets.SERVER_USER }}
-          server_password: ${{ secrets.SERVER_PASSWORD }}
-          server_port: 22
-          target_directory: ${{ secrets.TARGET_DIRECTORY }}
-          repo_directory: .
+          host: ${{ secrets.SERVER_HOST }}
+          user: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          source: 'deploy.tar'
+          target: './folder'
