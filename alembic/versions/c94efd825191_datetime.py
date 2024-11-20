@@ -34,6 +34,9 @@ def upgrade() -> None:
         sa.Column(
             "start_time", sa.DateTime(), nullable=False, server_default=sa.func.now()
         ),
+    )
+    op.add_column(
+        "conferences",
         sa.Column(
             "end_time", sa.DateTime(), nullable=False, server_default=sa.func.now()
         ),
@@ -73,9 +76,11 @@ def upgrade() -> None:
         sa.Column(
             "start_time", sa.DateTime(), nullable=False, server_default=sa.func.now()
         ),
+    )
+    op.add_column(
         sa.Column(
             "end_time", sa.DateTime(), nullable=False, server_default=sa.func.now()
-        ),
+        )
     )
 
     # Foreign key adjustments for lectures
