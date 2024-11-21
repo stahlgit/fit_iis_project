@@ -12,15 +12,37 @@ async function register() {
 }
 
 const emailRules = [
+  value => {
+    if (/.+@.+\..+/.test(value)) return true
 
+    return 'E-mail must be valid.'
+  },
+  value => {
+    if (value.length > 0) return true
+
+    return 'E-mail is required.'
+  }
 ];
 
 const passwordRules = [
+  value => {
+    if (value.length > 0) return true
 
+    return 'Password is required.'
+  },
+  value => {
+    if (value.length >= 8) return true
+
+    return 'Password must be at least 8 characters long.'
+  }
 ];
 
 const passwordConfirmationRules = [
+  value => {
+    if (value === password.value) return true
 
+    return 'Passwords do not match.'
+  }
 ];
 
 </script>
@@ -41,19 +63,19 @@ const passwordConfirmationRules = [
           <v-text-field
             v-model="email"
             label="Email"
-            rules="emailRules"
+            :rules="emailRules"
           ></v-text-field>
           <v-text-field
             v-model="password"
             label="Heslo"
             type="password"
-            rules="passwordRules"
+            :rules="passwordRules"
           ></v-text-field>
           <v-text-field
             v-model="passwordConfirmation"
             label="Ověření hesla"
             type="password"
-            rules="passwordConfirmationRules"
+            :rules="passwordConfirmationRules"
           ></v-text-field>
           <div class="d-flex">
             <v-btn

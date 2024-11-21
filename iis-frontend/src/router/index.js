@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'Root',
-    component: Root
+    redirect: '/public'
   },
   {
     path: '/login',
@@ -18,6 +18,48 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: () => import('../components/RegisterView.vue')
+  },
+  {
+    path: '/main',
+    name: 'Main',
+    component: () => import('../components/MainView.vue'),
+    children: [
+      {
+        path: 'conferences',
+        name: 'Conferences',
+        component: () => import('../components/ConferencesView.vue')
+      },
+      {
+        path: 'rooms',
+        name: 'Rooms',
+        component: () => import('../components/RoomsView.vue')
+      },
+      {
+        path: 'users',
+        name: 'Users',
+        component: () => import('../components/UsersView.vue')
+      },
+      {
+        path: 'reservations',
+        name: 'Reservations',
+        component: () => import('../components/ReservationsView.vue')
+      },
+      {
+        path: 'tickets',
+        name: 'Tickets',
+        component: () => import('../components/TicketsView.vue')
+      },
+      {
+        path: 'voting',
+        name: 'Voting',
+        component: () => import('../components/VotingView.vue')
+      }
+    ]
+  },
+  {
+    path: '/public',
+    name: 'Public',
+    component: () => import('../components/PublicView.vue'),
   }
   ]
 
@@ -29,7 +71,8 @@ const router = createRouter({
 // Navigation guard to check for authentication
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('authToken')
-  if (to.name !== 'Login' && to.name !== 'Register' && !token) {
+  console.log('Token:', token)
+  if (to.name !== 'Login' && to.name !== 'Register' && to.name !== 'Public' && !token) {
     next({ name: 'Login' })
   } else {
     next()
@@ -37,7 +80,14 @@ router.beforeEach(async (to, from, next) => {
 })
 
 // Function to log in the user and set JWT in local storage
-async function login(username, password) {
+export async function login(username, password) {
+  if (username === 'admin' && password === 'password') {
+    localStorage.setItem('authToken', 'dummy-token')
+    await router.push('/main')
+    return true
+  } else return false
+
+  /*
   try {
     const response = await axios.post('/api/login', { username, password })
     const token = response.data.token
@@ -47,6 +97,13 @@ async function login(username, password) {
     console.error('Login failed:', error)
     return false
   }
+  */
+
+}
+
+export async function logout() {
+  localStorage.removeItem('authToken')
+  await router.push('/')
 }
 
 // Workaround for https://github.com/vitejs/vite/issues/11804

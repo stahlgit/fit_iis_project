@@ -5,18 +5,41 @@ import { ref } from 'vue';
 const email = ref('');
 const password = ref('');
 
-async function login() {
+// from  index.js import login
+import { login } from '@/router'
+
+const snackbar = ref(false);
+
+async function doLogin() {
   console.log(email.value, password.value);
+  const res = await login(email.value, password.value);
+
+  if (res) {
+    console.log('Logged in');
+  } else {
+    console.log('Failed to log in');
+    snackbar.value = true;
+  }
 }
 
-const fieldRules = [
-  (v) => !!v || 'Povinné pole'
-];
+const emailRules = [
+  value => {
+    if (/.+@.+\..+/.test(value)) return true
+
+    return 'E-mail must be valid.'
+  },
+]
 
 </script>
 
 <template>
   <v-container>
+    <v-snackbar
+      v-model="snackbar"
+      color="error"
+    variant="tonal">
+      Nesprávné přihlašovací údaje
+    </v-snackbar>
     <v-card class="w-lg-33 mx-auto my-10" elevation="5">
       <v-card-title>Přihlášení</v-card-title>
       <v-divider></v-divider>
@@ -25,6 +48,7 @@ const fieldRules = [
           <v-text-field
             v-model="email"
             label="Email"
+            :rules="emailRules"
           ></v-text-field>
           <v-text-field
             v-model="password"
@@ -34,7 +58,7 @@ const fieldRules = [
           <div class="d-flex">
             <v-btn
               prepend-icon="mdi-login"
-              @click="login"
+              @click="doLogin"
               color="primary"
             >
               Přihlásit
