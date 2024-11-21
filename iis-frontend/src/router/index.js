@@ -82,7 +82,51 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
-// Function to log in the user and set JWT in local storage
+export async function register(username, email,password) {
+  const url = 'http://localhost:8000/user/register';
+
+  const userData = {
+    name: username,
+    email: email,
+    password: password,
+  };
+
+  try {
+    const response = await axios.post(url, userData, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    });
+
+    console.log('Registration successful:', response.data);
+
+    const loginSuccess = await login(email, password);
+    if(loginSuccess) {
+      await router.push('/main');
+      return true;
+    }
+    else {
+      console.error('Login failed:', error.response ? error.response.data : error.message);
+      return false;
+    }
+
+  } catch (error) {
+    if (error.response) {
+      const errorMessage = error.response.data.detail || 'An error occurred';
+      console.error('Registration failed:', errorMessage);
+      alert(errorMessage); // Display error message to the user
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+      alert('No response from the server. Please try again later.');
+    } else {
+      console.error('Error:', error.message);
+      alert('An unexpected error occurred. Please try again.');
+    }
+    return null;
+  }
+}
+
 
 export async function login(username, password) {
   const url = 'http://localhost:8000/user/token';

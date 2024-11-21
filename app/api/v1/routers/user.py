@@ -22,6 +22,8 @@ async def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_d
     try:
         if await User.get_by(db, name=user_in.name):
             raise HTTPException(status_code=400, detail="Username already registered")
+        if await User.get_by(db, email=user_in.email):
+            raise HTTPException(status_code=400, detail="Email already registered")
 
         user = await crud.register_user(user_in, db)
         if not user:

@@ -11,7 +11,6 @@ import { login } from '@/router'
 const snackbar = ref(false);
 
 async function doLogin() {
-  console.log(email.value, password.value);
   const res = await login(email.value, password.value);
 
   if (res) {

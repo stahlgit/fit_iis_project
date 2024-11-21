@@ -1,14 +1,33 @@
 <script setup>
 
 import { ref } from 'vue';
+import { register } from '@/router';
 
 const username = ref('');
 const email = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
+const usernameError = ref('');
+const emailError = ref('');
+const otherError = ref('');
 
-async function register() {
-  console.log(username.value, email.value, password.value, passwordConfirmation.value);
+async function doRegister() {
+  usernameError.value = '';
+  emailError.value = '';
+  otherError.value = '';
+  const res = await register(username.value, email.value, password.value);
+
+  if (res) {
+    console.log('Logged in');
+  } else {
+    console.log('Failed to log in');
+
+    if (res === 'Username already registered.') {
+      usernameError.value = 'This username is already taken.';
+    } else if (res === 'Email already registered.') {
+      emailError.value = 'This email is already registered.';
+    }
+  }
 }
 
 const emailRules = [
@@ -45,6 +64,13 @@ const passwordConfirmationRules = [
   }
 ];
 
+const usernameRules = [
+  value => {
+    if (value.length > 0) return true;
+    return 'Username is required.';
+  }
+];
+
 </script>
 
 <template>
@@ -59,11 +85,19 @@ const passwordConfirmationRules = [
           <v-text-field
             v-model="username"
             label="Uživatelské jméno"
+            :rules="usernameRules"
+            :error-messages="[usernameError]"
+
+
           ></v-text-field>
+          <!-- separator TODO: add error message under the field
+          TODO: turn off notification on website
+                      -->
           <v-text-field
             v-model="email"
             label="Email"
             :rules="emailRules"
+            :error-messages="[emailError]"
           ></v-text-field>
           <v-text-field
             v-model="password"
@@ -80,7 +114,7 @@ const passwordConfirmationRules = [
           <div class="d-flex">
             <v-btn
               prepend-icon="mdi-account-plus"
-              @click="register"
+              @click="doRegister"
               color="primary"
             >
               Registrovat
