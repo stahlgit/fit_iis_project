@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
-      interval: 10s
+      interval: 5s
       retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data

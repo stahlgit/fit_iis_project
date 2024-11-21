@@ -38,7 +38,7 @@ async def authenticate_user(
     db: Session = Depends(get_db),
 ) -> Optional[User]:
     try:
-        user = await User.get_one_by(db, name=username)
+        user = await User.get_one_by(db, email=username)
         ## password je input od usera
         ## hashed password je z DB
         if not user:

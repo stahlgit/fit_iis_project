@@ -29,4 +29,8 @@ RUN pip install "poetry==$POETRY_VERSION" && \
     poetry export --output requirements.txt && \
     pip install --no-deps -r requirements.txt
 
-COPY . .
+COPY app app
+COPY main.py main.py
+COPY alembic alembic
+COPY alembic.ini alembic.ini
+COPY .entrypoint.sh .entrypoint.sh

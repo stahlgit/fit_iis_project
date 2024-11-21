@@ -6,3 +6,6 @@ logs
 .pytest_cache
 .vscode
 .idea
+iis-frontend/package-lock.json
+iis-frontend/yarn.lock
+iis-frontend/package.json

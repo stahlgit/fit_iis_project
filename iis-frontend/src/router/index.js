@@ -2,6 +2,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Root from '../components/HelloWorld.vue'
 import axios from 'axios'
+import { ca } from 'vuetify/locale'
+
+const API_BASE_URL = 'http://localhost:8000/'
 
 const routes = [
   {
@@ -80,25 +83,35 @@ router.beforeEach(async (to, from, next) => {
 })
 
 // Function to log in the user and set JWT in local storage
+
 export async function login(username, password) {
-  if (username === 'admin' && password === 'password') {
-    localStorage.setItem('authToken', 'dummy-token')
-    await router.push('/main')
-    return true
-  } else return false
+  const url = 'http://localhost:8000/user/token';
 
-  /*
+  // Form data as a URL-encoded string
+  const formData = new URLSearchParams();
+  formData.append('grant_type', 'password');
+  formData.append('username', username);
+  formData.append('password', password);
+  formData.append('scope', '');
+  formData.append('client_id', 'string'); // Use the correct client ID
+  formData.append('client_secret', 'string'); // Use the correct client secret
+
   try {
-    const response = await axios.post('/api/login', { username, password })
-    const token = response.data.token
-    localStorage.setItem('authToken', token)
-    return true
-  } catch (error) {
-    console.error('Login failed:', error)
-    return false
-  }
-  */
+    const response = await axios.post(url, formData, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
 
+    });
+
+    localStorage.setItem('authToken', response.data.access_token);
+    await router.push('/main');
+    return true;
+  } catch (error) {
+    console.error('Login failed:', error.response ? error.response.data : error.message);
+    return null; // Handle error appropriately
+  }
 }
 
 export async function logout() {
