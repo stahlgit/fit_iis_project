@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.models import Voting
+from app.api.crud.user import role_required
+from app.api.models import User, UserRole, Voting
 from app.api.v1.schemas import voting as schemas
 from app.services import get_db, log_endpoint, not_found
 
@@ -19,8 +20,10 @@ router = APIRouter(
 )
 @log_endpoint
 async def create_voting(
-    voting_in: schemas.VotingCreateSchema, db: Session = Depends(get_db)
-):
+    voting_in: schemas.VotingCreateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.VotingSchema:
     try:
         if await Voting.get_by(db, name=voting_in.name):
             raise HTTPException(status_code=400, detail="Voting already registered")
@@ -31,7 +34,10 @@ async def create_voting(
 
 @router.get("/all", response_model=List[schemas.VotingSchema])
 @log_endpoint
-async def read_votings(db: Session = Depends(get_db)):
+async def read_votings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.VotingSchema]:
     try:
         return await Voting.get_all(db)
     except Exception as e:
@@ -40,7 +46,11 @@ async def read_votings(db: Session = Depends(get_db)):
 
 @router.get("/{voting_id}", response_model=schemas.VotingSchema)
 @log_endpoint
-async def read_voting(voting_id: int, db: Session = Depends(get_db)):
+async def read_voting(
+    voting_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+):
     try:
         voting = Voting.get(voting_id, session=db)
         if not voting:
@@ -53,7 +63,10 @@ async def read_voting(voting_id: int, db: Session = Depends(get_db)):
 @router.put("/{voting_id}", response_model=schemas.VotingUpdateSchema)
 @log_endpoint
 async def update_voting(
-    voting_id: int, voting_in: schemas.VotingUpdateSchema, db: Session = Depends(get_db)
+    voting_id: int,
+    voting_in: schemas.VotingUpdateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ):
     try:
         voting = Voting.get(voting_id, session=db)
@@ -64,9 +77,13 @@ async def update_voting(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{voting_id}")
+@router.delete("/{voting_id}", response_model=schemas.VotingSchema)
 @log_endpoint
-async def delete_voting(voting_id: int, db: Session = Depends(get_db)):
+async def delete_voting(
+    voting_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.VotingSchema:
     try:
         voting = Voting.get(voting_id, session=db)
         if not voting:

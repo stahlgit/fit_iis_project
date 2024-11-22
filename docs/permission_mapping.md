@@ -10,7 +10,7 @@
 
 ### REGISTERED USER
 
-- submit presentation
+- submit presentation (create, update, delete)
 - get rooms
 - view conference schedule (get)
 - book ticket

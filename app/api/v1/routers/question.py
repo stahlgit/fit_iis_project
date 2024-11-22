@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.models import Question
+from app.api.crud.user import role_required
+from app.api.models import Question, User, UserRole
 from app.api.v1.schemas import question as schemas
 from app.services import get_db, log_endpoint, not_found
 
@@ -19,8 +20,10 @@ router = APIRouter(
 )
 @log_endpoint
 async def create_question(
-    question_in: schemas.QuestionCreateSchema, db: Session = Depends(get_db)
-):
+    question_in: schemas.QuestionCreateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.QuestionSchema:
     try:
         if await Question.get_by(db, name=question_in.name):
             raise HTTPException(status_code=400, detail="Question already registered")
@@ -31,7 +34,10 @@ async def create_question(
 
 @router.get("/all", response_model=List[schemas.QuestionSchema])
 @log_endpoint
-async def read_questions(db: Session = Depends(get_db)):
+async def read_questions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.QuestionSchema]:
     try:
         return await Question.get_all(db)
     except Exception as e:
@@ -40,7 +46,11 @@ async def read_questions(db: Session = Depends(get_db)):
 
 @router.get("/{question_id}", response_model=schemas.QuestionSchema)
 @log_endpoint
-async def read_question(question_id: int, db: Session = Depends(get_db)):
+async def read_question(
+    question_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.QuestionSchema:
     try:
         question = await Question.get(question_id, session=db)
         if not question:
@@ -56,7 +66,8 @@ async def update_question(
     question_id: int,
     question_in: schemas.QuestionUpdateSchema,
     db: Session = Depends(get_db),
-):
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.QuestionUpdateSchema:
     try:
         question = await Question.get(question_id, session=db)
         if not question:
@@ -66,9 +77,13 @@ async def update_question(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{question_id}")
+@router.delete("/{question_id}", response_model=schemas.QuestionSchema)
 @log_endpoint
-async def delete_lecture(question_id: int, db: Session = Depends(get_db)):
+async def delete_lecture(
+    question_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.QuestionSchema:
     try:
         question = await Question.get(question_id, session=db)
         if not question:

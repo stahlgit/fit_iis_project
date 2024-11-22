@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.models import Lecture
+from app.api.crud.user import role_required
+from app.api.models import Lecture, User, UserRole
 from app.api.v1.schemas import lecture as schemas
 from app.services import get_db, log_endpoint, not_found
 
@@ -19,8 +20,10 @@ router = APIRouter(
 )
 @log_endpoint
 async def create_lecture(
-    lecture_in: schemas.LectureCreateSchema, db: Session = Depends(get_db)
-):
+    lecture_in: schemas.LectureCreateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.LectureSchema:
     try:
         if await Lecture.get_by(db, name=lecture_in.name):
             raise HTTPException(status_code=400, detail="Lecture already registered")
@@ -31,7 +34,10 @@ async def create_lecture(
 
 @router.get("/all", response_model=List[schemas.LectureSchema])
 @log_endpoint
-async def read_lectures(db: Session = Depends(get_db)):
+async def read_lectures(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.LectureSchema]:
     try:
         return await Lecture.get_all(db)
     except Exception as e:
@@ -40,7 +46,11 @@ async def read_lectures(db: Session = Depends(get_db)):
 
 @router.get("/{lecture_id}", response_model=schemas.LectureSchema)
 @log_endpoint
-async def read_lecture(lecture_id: int, db: Session = Depends(get_db)):
+async def read_lecture(
+    lecture_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.LectureSchema:
     try:
         lecture = await Lecture.get(lecture_id, sesion=db)
         if not lecture:
@@ -56,7 +66,8 @@ async def update_lecture(
     lecture_id: int,
     lecture_in: schemas.LectureUpdateSchema,
     db: Session = Depends(get_db),
-):
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.LectureUpdateSchema:
     try:
         lecture = await Lecture.get(lecture_id, sesion=db)
         if not lecture:
@@ -66,9 +77,13 @@ async def update_lecture(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{lecture_id}")
+@router.delete("/{lecture_id}", response_model=schemas.LectureSchema)
 @log_endpoint
-async def delete_lecture(lecture_id: int, db: Session = Depends(get_db)):
+async def delete_lecture(
+    lecture_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.LectureSchema:
     try:
         lecture = await Lecture.get(lecture_id, sesion=db)
         if not lecture:
