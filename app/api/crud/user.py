@@ -3,7 +3,6 @@ from typing import Annotated, Optional
 
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
-from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 
 from app.api.models import User, UserRole
@@ -74,7 +73,7 @@ async def get_current_user(
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-    except InvalidTokenError:
+    except JWTError:
         raise credentials_exception
     user = await User.get_one_by(db, name=username)
     if user is None:
@@ -90,12 +89,6 @@ async def get_current_active_user(
     return current_user
 
 
-async def get_admin(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return current_user
-
-
 async def set_role(
     user_id: int, new_role: UserRole, db: Session = Depends(get_db)
 ) -> User:
@@ -103,3 +96,16 @@ async def set_role(
     if not user:
         not_found("User")
     return await User.update(db, id=user_id, role=new_role)
+
+
+def role_required(required_role: UserRole):
+    async def role_checker(current_user: User = Depends(get_current_user)):
+        ## ak je admin, tak moze robit vsetko
+        if current_user.role != required_role or current_user.role == UserRole.ADMIN:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Operation not permitted",
+            )
+        return current_user
+
+    return role_checker

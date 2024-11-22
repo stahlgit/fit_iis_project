@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.models import Room
+from app.api.crud.user import role_required
+from app.api.models import Room, User, UserRole
 from app.api.v1.schemas import room as schemas
 from app.services import get_db, log_endpoint, not_found
 
@@ -18,7 +19,11 @@ router = APIRouter(
     "/", response_model=schemas.RoomSchema, status_code=status.HTTP_201_CREATED
 )
 @log_endpoint
-async def create_room(room_in: schemas.RoomCreateSchema, db: Session = Depends(get_db)):
+async def create_room(  # ADMIN ONLY
+    room_in: schemas.RoomCreateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.ADMIN)),
+) -> schemas.RoomSchema:
     try:
         if await Room.get_by(db, name=room_in.name):
             raise HTTPException(status_code=400, detail="Room already registered")
@@ -29,7 +34,10 @@ async def create_room(room_in: schemas.RoomCreateSchema, db: Session = Depends(g
 
 @router.get("/all", response_model=List[schemas.RoomSchema])
 @log_endpoint
-async def read_rooms(db: Session = Depends(get_db)):
+async def read_rooms(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.RoomSchema]:
     try:
         return await Room.get_all(db)
     except Exception as e:
@@ -38,7 +46,11 @@ async def read_rooms(db: Session = Depends(get_db)):
 
 @router.get("/{room_id}", response_model=schemas.RoomSchema)
 @log_endpoint
-async def read_room(room_id: int, db: Session = Depends(get_db)):
+async def read_room(
+    room_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.RoomSchema:
     try:
         room = await Room.get(room_id, session=db)
         if not room:
@@ -51,8 +63,11 @@ async def read_room(room_id: int, db: Session = Depends(get_db)):
 @router.put("/{room_id}", response_model=schemas.RoomUpdateSchema)
 @log_endpoint
 async def update_room(
-    room_id: int, room_in: schemas.RoomUpdateSchema, db: Session = Depends(get_db)
-):
+    room_id: int,
+    room_in: schemas.RoomUpdateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.ADMIN)),
+) -> schemas.RoomUpdateSchema:
     try:
         room = await Room.get(room_id, session=db)
         if not room:
@@ -62,9 +77,13 @@ async def update_room(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{room_id}")
+@router.delete("/{room_id}", response_model=schemas.RoomSchema)
 @log_endpoint
-async def delete_room(room_id: int, db: Session = Depends(get_db)):
+async def delete_room(
+    room_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.ADMIN)),
+) -> schemas.RoomSchema:
     try:
         room = await Room.get(room_id, session=db)
         if room is None:

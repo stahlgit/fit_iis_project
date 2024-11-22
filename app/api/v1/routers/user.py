@@ -18,7 +18,9 @@ router = APIRouter(
 
 @router.post("/register", response_model=schemas.UserSchema)
 @log_endpoint
-async def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
+async def register_user(
+    user_in: schemas.UserCreate, db: Session = Depends(get_db)
+) -> schemas.UserSchema:
     try:
         if await User.get_by(db, name=user_in.name):
             raise HTTPException(status_code=400, detail="Username already registered")
@@ -64,11 +66,9 @@ async def read_users_me(
 async def set_user_role(
     user_id: int,
     new_role: UserRole,
-    admin_user=Depends(crud.get_admin),
+    current_user: User = Depends(crud.role_required(UserRole.ADMIN)),
     db: Session = Depends(get_db),
 ):
-    if not admin_user:
-        raise HTTPException(status_code=401, detail="Admin access required")
     user = await crud.set_role(user_id, new_role, db)
     if not user:
         raise HTTPException(

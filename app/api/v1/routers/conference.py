@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.models import Conference
+from app.api.crud.user import role_required
+from app.api.models import Conference, User, UserRole
 from app.api.v1.schemas import conference as schemas
 from app.services import get_db, log_endpoint, not_found
 
@@ -15,12 +16,14 @@ router = APIRouter(
 
 
 @router.post(
-    "/", response_model=schemas.ConferenceCreate, status_code=status.HTTP_201_CREATED
+    "/", response_model=schemas.ConferenceSchema, status_code=status.HTTP_201_CREATED
 )
 @log_endpoint
-async def create_conference(
-    conference_in: schemas.ConferenceCreate, db: Session = Depends(get_db)
-):
+async def create_conference(  # ADMIN ONLY
+    conference_in: schemas.ConferenceCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.ADMIN)),
+) -> schemas.ConferenceSchema:
     try:
         if await Conference.get_by(db, name=conference_in.name):
             raise HTTPException(status_code=400, detail="Conference already registered")
@@ -29,18 +32,22 @@ async def create_conference(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.get("/all", response_model=List[schemas.ConferenceSchema])
+@router.get("/all", response_model=List[schemas.ConferenceSchema])  # EVERY USER
 @log_endpoint
-async def read_conferences(db: Session = Depends(get_db)):  # TODO skip + limit ?
+async def read_conferences(
+    db: Session = Depends(get_db),
+) -> List[schemas.ConferenceSchema]:
     try:
         return await Conference.get_all(db)
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.get("/{conference_id}", response_model=schemas.ConferenceSchema)
+@router.get("/{conference_id}", response_model=schemas.ConferenceSchema)  # EVERY USER
 @log_endpoint
-async def read_conference(conference_id: int, db: Session = Depends(get_db)):
+async def read_conference(
+    conference_id: int, db: Session = Depends(get_db)
+) -> schemas.ConferenceSchema:
     try:
         conference = await Conference.get(conference_id, session=db)
         if not conference:
@@ -51,13 +58,14 @@ async def read_conference(conference_id: int, db: Session = Depends(get_db)):
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.put("/{conference_id}", response_model=schemas.ConferenceUpdate)
+@router.put("/{conference_id}", response_model=schemas.ConferenceUpdate)  # ADMIN ONLY
 @log_endpoint
 async def update_conference(
     conference_id: int,
     conference_in: schemas.ConferenceUpdate,
     db: Session = Depends(get_db),
-):
+    current_user: User = Depends(role_required(UserRole.ADMIN)),
+) -> schemas.ConferenceUpdate:
     try:
         conference = await Conference.get(conference_id, session=db)
         if not conference:
@@ -69,9 +77,13 @@ async def update_conference(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{conference_id}")
+@router.delete("/{conference_id}", response_model=schemas.ConferenceSchema)
 @log_endpoint
-async def delete_conference(conference_id: int, db: Session = Depends(get_db)):
+async def delete_conference(  # ADMIN ONLY
+    conference_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.ADMIN)),
+) -> schemas.ConferenceSchema:
     try:
         conference = await Conference.get(conference_id, session=db)
         if not conference:

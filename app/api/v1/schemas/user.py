@@ -9,13 +9,14 @@ from app.api.models import UserRole
 from app.api.v1 import schemas as schemas
 
 
-class TokenData(BaseModel):
-    id: int | None = None
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class TokenData(BaseModel):
+    id: Optional[int] = None
+    username: Optional[str] = None
 
 
 class UserBase(BaseModel):
