@@ -11,7 +11,8 @@ import app.api.v1.schemas as schemas
 class LectureBase(BaseModel):
     name: str
     description: Optional[str] = None
-    time_interval: Optional[tuple[datetime, datetime]] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
     tags: Optional[str] = None
     image: Optional[str] = None
     room_id: int

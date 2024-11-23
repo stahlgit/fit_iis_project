@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.models import GivenPresentation
+from app.api.crud.user import role_required
+from app.api.models import GivenPresentation, User, UserRole
 from app.api.v1.schemas import given_presentation as schemas
 from app.services import get_db, log_endpoint, not_found
 
@@ -21,13 +22,11 @@ router = APIRouter(
 )
 @log_endpoint
 async def create_given_presentation(
-    given_in: schemas.GivenPresentationCreateSchema, db: Session = Depends(get_db)
-):
+    given_in: schemas.GivenPresentationCreateSchema,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.GivenPresentationCreateSchema:
     try:
-        if await GivenPresentation.get_by(db, name=given_in.name):
-            raise HTTPException(
-                status_code=400, detail="Given Presentation already registered"
-            )
         return await GivenPresentation.create(db, **given_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
@@ -36,17 +35,22 @@ async def create_given_presentation(
 @router.get("/all", response_model=List[schemas.GivenPresentationSchema])
 @log_endpoint
 async def read_given_presentations(
-    skip: int = 0, limi: int = 100, db: Session = Depends(get_db)
-):
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.GivenPresentationSchema]:
     try:
         return await GivenPresentation.get_all(db)
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
 
-@router.get("/{given_id}", response_model=schemas.GivenPresentationCreateSchema)
+@router.get("/{given_id}", response_model=schemas.GivenPresentationSchema)
 @log_endpoint
-async def read_given_presentation(given_id: int, db: Session = Depends(get_db)):
+async def read_given_presentation(
+    given_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.GivenPresentationSchema:
     try:
         given_presentation = await GivenPresentation.get(given_id, session=db)
         if not given_presentation:
@@ -63,7 +67,8 @@ async def update_given_presentation(
     given_id: int,
     given_in: schemas.GivenPresentationUpdateSchema,
     db: Session = Depends(get_db),
-):
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.GivenPresentationUpdateSchema:
     try:
         given_presentation = await GivenPresentation.get(given_id, session=db)
         if not given_presentation:
@@ -73,9 +78,13 @@ async def update_given_presentation(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.delete("/{given_id}")
+@router.delete("/{given_id}", response_model=schemas.GivenPresentationSchema)
 @log_endpoint
-async def delete_given_presentation(given_id: int, db: Session = Depends(get_db)):
+async def delete_given_presentation(
+    given_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> schemas.GivenPresentationSchema:
     try:
         given_presentation = await GivenPresentation.get(given_id, session=db)
         if not given_presentation:

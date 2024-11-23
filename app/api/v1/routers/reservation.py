@@ -21,7 +21,7 @@ router = APIRouter(
 @log_endpoint
 async def create_reservation(
     reservation_in: schemas.ReservationCreateSchema, db: Session = Depends(get_db)
-):
+) -> schemas.ReservationSchema:
     try:
         return await Reservation.create(db, **reservation_in.model_dump())
     except Exception as e:
@@ -30,7 +30,9 @@ async def create_reservation(
 
 @router.get("/all", response_model=List[schemas.ReservationSchema])
 @log_endpoint
-async def read_reservations(db: Session = Depends(get_db)):
+async def read_reservations(
+    db: Session = Depends(get_db),
+) -> List[schemas.ReservationSchema]:
     try:
         return await Reservation.get_all(db)
     except Exception as e:

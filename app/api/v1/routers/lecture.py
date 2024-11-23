@@ -27,6 +27,11 @@ async def create_lecture(
     try:
         if await Lecture.get_by(db, name=lecture_in.name):
             raise HTTPException(status_code=400, detail="Lecture already registered")
+        if not await Lecture.get_by(db, id=lecture_in.room_id):
+            raise not_found("Room")
+        if not await Lecture.get_by(db, id=lecture_in.conference_id):
+            raise not_found("Conference")
+
         return await Lecture.create(db, **lecture_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
@@ -52,7 +57,7 @@ async def read_lecture(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.LectureSchema:
     try:
-        lecture = await Lecture.get(lecture_id, sesion=db)
+        lecture = await Lecture.get(lecture_id, session=db)
         if not lecture:
             not_found("Lecture")
         return schemas.LectureSchema(**lecture.__dict__)
