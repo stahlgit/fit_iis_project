@@ -40,3 +40,7 @@ class ConferenceSchema(ConferenceBase):
 
     class Config:
         from_attributes = True
+
+
+class ConferenceAvailableSpaces(BaseModel):
+    available: int

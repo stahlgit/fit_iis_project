@@ -23,10 +23,6 @@ async def create_reservation(
     reservation_in: schemas.ReservationCreateSchema, db: Session = Depends(get_db)
 ):
     try:
-        if await Reservation.get_by(db, name=reservation_in.name):
-            raise HTTPException(
-                status_code=400, detail="Reservation already registered"
-            )
         return await Reservation.create(db, **reservation_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")

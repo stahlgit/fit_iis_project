@@ -101,7 +101,10 @@ async def set_role(
 def role_required(required_role: UserRole):
     async def role_checker(current_user: User = Depends(get_current_user)):
         ## ak je admin, tak moze robit vsetko
-        if current_user.role != required_role or current_user.role == UserRole.ADMIN:
+        if current_user.role == UserRole.ADMIN:
+            return current_user
+
+        if current_user.role != required_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Operation not permitted",

@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.crud import conference as crud
 from app.api.crud.user import role_required
 from app.api.models import Conference, User, UserRole
 from app.api.v1.schemas import conference as schemas
@@ -90,5 +91,23 @@ async def delete_conference(  # ADMIN ONLY
             not_found("Conference")
         await Conference.delete(db, id=conference_id)
         return conference
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error occurred: {e}")
+
+
+@router.get("/{conference_id}/available")
+@log_endpoint
+async def get_free_tickets(
+    conference_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+):
+    try:
+        conference = await Conference.get_one_by(db, id=conference_id)
+        if not conference:
+            not_found("Conference")
+
+        return await crud.get_free_tickets(conference, db)
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error occurred: {e}")

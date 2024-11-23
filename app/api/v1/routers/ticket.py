@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.crud import ticket as crud
 from app.api.crud.user import role_required
 from app.api.models import Ticket, User, UserRole
 from app.api.v1.schemas import ticket as schemas
@@ -25,9 +26,8 @@ async def create_ticket(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.TicketSchema:
     try:
-        if await Ticket.get_by(db, name=ticket_in.name):
-            raise HTTPException(status_code=400, detail="Ticket already registered")
-        return await Ticket.create(db, **ticket_in.model_dump())
+        ticket = await crud.create_ticket(db=db, ticket_in=ticket_in)
+        return ticket
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
@@ -52,7 +52,7 @@ async def read_ticket(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.TicketSchema:
     try:
-        ticket = Ticket.get(ticket_id, session=db)
+        ticket = Ticket.get_by(ticket_id, session=db)
         if not ticket:
             not_found("Ticket")
         return schemas.TicketSchema(**ticket.__dict__)
