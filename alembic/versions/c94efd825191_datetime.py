@@ -78,9 +78,10 @@ def upgrade() -> None:
         ),
     )
     op.add_column(
+        "lectures",
         sa.Column(
             "end_time", sa.DateTime(), nullable=False, server_default=sa.func.now()
-        )
+        ),
     )
 
     # Foreign key adjustments for lectures
