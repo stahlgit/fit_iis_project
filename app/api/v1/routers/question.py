@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.crud.user import role_required
 from app.api.models import Question, User, UserRole
 from app.api.v1.schemas import question as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/question",
@@ -25,8 +25,14 @@ async def create_question(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.QuestionSchema:
     try:
-        if await Question.get_by(db, name=question_in.name):
-            raise HTTPException(status_code=400, detail="Question already registered")
+        await check_entities_exist(
+            db,
+            {
+                "user": [question_in.user_id],
+                "lecture": [question_in.lecture_id],
+            },
+        )
+
         return await Question.create(db, **question_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")

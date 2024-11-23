@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timedelta
 from typing import Annotated, Optional
 
@@ -103,8 +104,7 @@ def role_required(required_role: UserRole):
         ## ak je admin, tak moze robit vsetko
         if current_user.role == UserRole.ADMIN:
             return current_user
-
-        if current_user.role != required_role:
+        elif current_user.role != required_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Operation not permitted",
@@ -112,3 +112,28 @@ def role_required(required_role: UserRole):
         return current_user
 
     return role_checker
+
+
+async def get_guest_name(db: Session) -> str:
+    while True:
+        guest_number = random.randint(100000, 999999)
+        guest_name = f"guest_{guest_number}"
+        if not await User.get_one_by(db, name=guest_name):
+            break
+    return guest_name
+
+
+async def create_guest(db: Session, email: str) -> User:
+    guest_name = await get_guest_name(db)
+    guest_password = guest_name
+    hashed_password = get_password_hash(guest_password)
+    new_user = await User.create(
+        db,
+        name=guest_name,
+        email=email,
+        hashed_password=hashed_password,
+        role=UserRole.GUEST,
+    )
+    if not new_user:
+        raise HTTPException(status_code=400, detail="Error while creating user")
+    return new_user

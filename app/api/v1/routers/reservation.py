@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from app.api.models import Reservation
+from app.api.crud.user import create_guest
+from app.api.models import Conference, Reservation, User
 from app.api.v1.schemas import reservation as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.api.v1.schemas.user import UserSchema
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/reservation",
@@ -20,10 +22,31 @@ router = APIRouter(
 )
 @log_endpoint
 async def create_reservation(
-    reservation_in: schemas.ReservationCreateSchema, db: Session = Depends(get_db)
+    reservation_in: schemas.ReservationCreateSchema,
+    db: Session = Depends(get_db),
 ) -> schemas.ReservationSchema:
     try:
-        return await Reservation.create(db, **reservation_in.model_dump())
+        await check_entities_exist(
+            db,
+            {
+                "conference": [reservation_in.conference_id],
+            },
+        )
+
+        if reservation_in.user_id is not None:
+            user = await User.get(reservation_in.user_id, session=db)
+            if not user:
+                not_found("User")
+            return await Reservation.create(db, **reservation_in.model_dump())
+        else:
+            guest = await create_guest(db, reservation_in.email)
+
+            reservation_data = reservation_in.model_dump()
+            reservation_data.pop("email")
+            reservation_data["user_id"] = guest.id
+
+            return await Reservation.create(db, **reservation_data)
+
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 

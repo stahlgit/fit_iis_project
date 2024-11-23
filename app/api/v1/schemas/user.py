@@ -22,6 +22,7 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     name: str
     email: str
+    role: UserRole
 
 
 class UserCreate(UserBase):

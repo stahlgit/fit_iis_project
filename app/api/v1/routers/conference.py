@@ -7,7 +7,7 @@ from app.api.crud import conference as crud
 from app.api.crud.user import role_required
 from app.api.models import Conference, User, UserRole
 from app.api.v1.schemas import conference as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/conferences",
@@ -28,6 +28,14 @@ async def create_conference(  # ADMIN ONLY
     try:
         if await Conference.get_by(db, name=conference_in.name):
             raise HTTPException(status_code=400, detail="Conference already registered")
+
+        await check_entities_exist(
+            db,
+            {
+                "room": [conference_in.organizer_id],
+            },
+        )
+
         return await Conference.create(db, **conference_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")

@@ -16,7 +16,7 @@ class ReservationBase(BaseModel):
 
 
 class ReservationCreateSchema(ReservationBase):
-    pass
+    email: Optional[str] = None  ## guest
 
 
 class ReservationUpdateSchema(ReservationBase):
@@ -24,6 +24,13 @@ class ReservationUpdateSchema(ReservationBase):
 
 
 class ReservationSchema(ReservationBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class ReservationGuestSchema(ReservationBase):
     id: int
 
     class Config:

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.crud.user import role_required
 from app.api.models import Room, User, UserRole
 from app.api.v1.schemas import room as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/room",
@@ -25,6 +25,13 @@ async def create_room(  # ADMIN ONLY
     current_user: User = Depends(role_required(UserRole.ADMIN)),
 ) -> schemas.RoomSchema:
     try:
+        await check_entities_exist(
+            db,
+            {
+                "conference": [room_in.conference_id],
+            },
+        )
+
         if await Room.get_by(db, name=room_in.name):
             raise HTTPException(status_code=400, detail="Room already registered")
         return await Room.create(db, **room_in.model_dump())

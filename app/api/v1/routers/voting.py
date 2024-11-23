@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.crud.user import role_required
 from app.api.models import User, UserRole, Voting
 from app.api.v1.schemas import voting as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/voting",
@@ -25,8 +25,13 @@ async def create_voting(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.VotingSchema:
     try:
-        if await Voting.get_by(db, name=voting_in.name):
-            raise HTTPException(status_code=400, detail="Voting already registered")
+        await check_entities_exist(
+            db,
+            {
+                "user": [voting_in.user_id],
+                "luecture": [voting_in.lecture_id],
+            },
+        )
         return await Voting.create(db, **voting_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")

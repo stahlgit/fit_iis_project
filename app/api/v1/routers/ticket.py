@@ -7,7 +7,7 @@ from app.api.crud import ticket as crud
 from app.api.crud.user import role_required
 from app.api.models import Ticket, User, UserRole
 from app.api.v1.schemas import ticket as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/ticket",
@@ -26,6 +26,13 @@ async def create_ticket(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.TicketSchema:
     try:
+        await check_entities_exist(
+            db,
+            {
+                "reservation": [ticket_in.reservation_id],
+            },
+        )
+
         ticket = await crud.create_ticket(db=db, ticket_in=ticket_in)
         return ticket
     except Exception as e:

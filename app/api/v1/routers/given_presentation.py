@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.crud.user import role_required
 from app.api.models import GivenPresentation, User, UserRole
 from app.api.v1.schemas import given_presentation as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/given_presentation",
@@ -27,6 +27,14 @@ async def create_given_presentation(
     current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.GivenPresentationCreateSchema:
     try:
+        await check_entities_exist(
+            db,
+            {
+                "user": [given_in.user_id],
+                "conference": [given_in.conference_id],
+            },
+        )
+
         return await GivenPresentation.create(db, **given_in.model_dump())
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")

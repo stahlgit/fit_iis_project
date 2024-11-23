@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.crud.user import role_required
 from app.api.models import Lecture, User, UserRole
 from app.api.v1.schemas import lecture as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/lecture",
@@ -27,10 +27,15 @@ async def create_lecture(
     try:
         if await Lecture.get_by(db, name=lecture_in.name):
             raise HTTPException(status_code=400, detail="Lecture already registered")
-        if not await Lecture.get_by(db, id=lecture_in.room_id):
-            raise not_found("Room")
-        if not await Lecture.get_by(db, id=lecture_in.conference_id):
-            raise not_found("Conference")
+
+        await check_entities_exist(
+            db,
+            {
+                "room": [lecture_in.room_id],
+                "conference": [lecture_in.conference_id],
+                "user": [lecture_in.lecturer_id],
+            },
+        )
 
         return await Lecture.create(db, **lecture_in.model_dump())
     except Exception as e:
