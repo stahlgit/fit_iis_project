@@ -117,6 +117,37 @@ async def register_guest(
         raise HTTPException(400, f"Error occured: {e}")
 
 
+@router.get("/{user_id}", response_model=schemas.UserSchema)
+@log_endpoint
+async def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        user = await User.get_one_by(db, id=user_id)
+        if not user:
+            not_found("User")
+        return schemas.UserSchema(**user.__dict__)
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.put("/{user_id}", response_model=schemas.UserSchema)
+@log_endpoint
+async def update_user(
+    user_id: int,
+    user_in: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+):
+    try:
+        user = await User.get_one_by(db, id=user_id)
+        if not user:
+            not_found("User")
+        return await User.update(db, id=user_id, **user_in.dict())
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
 ## THIS WILL BE DELETED LATER
 @router.post("{user_id}/DEVset_admin", response_model=schemas.UserSchema)
 @log_endpoint
