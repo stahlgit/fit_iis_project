@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -75,6 +75,18 @@ async def set_user_role(
             status_code=400, detail="Error occured while setting user role"
         )
     return user
+
+
+@router.get("/all", response_model=List[schemas.UserSchema])
+@log_endpoint
+async def get_all_users(
+    current_user: User = Depends(crud.role_required(UserRole.ADMIN)),
+    db: Session = Depends(get_db),
+) -> List[schemas.UserSchema]:
+    try:
+        return await User.get_all(db)
+    except Exception as e:
+        raise HTTPException(400, f"Error occurred: {e}")
 
 
 ## THIS WILL BE DELETED LATER

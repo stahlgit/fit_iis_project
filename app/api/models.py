@@ -46,6 +46,9 @@ class Conference(BaseModelMixin, Base):
 
     price: Mapped[Optional[Float]] = mapped_column(Float, nullable=True)
     capacity: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    organizer_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=True
+    )
 
     rooms: Mapped[List["Room"]] = relationship("Room", back_populates="conference")
 
@@ -61,6 +64,10 @@ class Conference(BaseModelMixin, Base):
         "GivenPresentation",
         back_populates="conference"
         ## track history ???
+    )
+
+    organizer: Mapped["User"] = relationship(
+        "User", back_populates="conferences_as_organizer"
     )
 
     __table_args__ = (
@@ -98,6 +105,10 @@ class User(BaseModelMixin, Base):
     )
     given_presentations: Mapped[List["GivenPresentation"]] = relationship(
         "GivenPresentation", back_populates="user"
+    )
+
+    conferences_as_organizer: Mapped[List["Conference"]] = relationship(
+        "Conference", back_populates="organizer"
     )
 
 
