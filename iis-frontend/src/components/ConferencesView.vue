@@ -1,9 +1,9 @@
 <script setup>
 import {onMounted, ref} from "vue";
- import {axiosInstance} from "@/router";
+import {axiosInstance} from "@/router";
 
- const loading = ref(false)
- const conferences = ref([])
+const loading = ref(false)
+const conferences = ref([])
 
  function fetchConferences() {
    loading.value = true
