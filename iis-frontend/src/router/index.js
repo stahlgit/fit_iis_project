@@ -64,6 +64,11 @@ const routes = [
         path: 'voting',
         name: 'Voting',
         component: () => import('../components/VotingView.vue')
+      },
+      {
+        path: 'presentations',
+        name: 'Presentations',
+        component: () => import('../components/PresentationsView.vue')
       }
     ]
   },
@@ -174,6 +179,10 @@ export async function login(username, password) {
 export async function logout() {
   localStorage.removeItem('authToken')
   await router.push('/')
+}
+
+export function isLoggedIn() {
+  return localStorage.getItem('authToken') !== null
 }
 
 // Workaround for https://github.com/vitejs/vite/issues/11804

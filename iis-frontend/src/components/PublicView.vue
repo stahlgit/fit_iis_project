@@ -2,6 +2,7 @@
 
 import {onMounted, ref} from "vue";
 import router, {axiosInstance} from "@/router";
+import {isLoggedIn} from "@/router";
 
 const conferences = ref([])
 const loading = ref(true)
@@ -34,10 +35,13 @@ onMounted(() => {
 <template>
   <v-app-bar>
     <v-app-bar-title>
-      Konference v0.1
+      Konference
     </v-app-bar-title>
     <v-spacer/>
-    <v-btn to="/login">
+    <v-btn v-if="isLoggedIn" to="main" prepend-icon="mdi-account">
+      Můj účet
+    </v-btn>
+    <v-btn v-else to="/login">
       Přihlásit se
     </v-btn>
   </v-app-bar>
