@@ -32,6 +32,9 @@ class ReservationSchema(ReservationBase):
 
 class ReservationGuestSchema(ReservationBase):
     id: int
+    username: str
+    email: str
+    password: str
 
     class Config:
         from_attributes = True

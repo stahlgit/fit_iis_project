@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,9 +17,7 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/", response_model=schemas.ReservationSchema, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 @log_endpoint
 async def create_reservation(
     reservation_in: schemas.ReservationCreateSchema,
@@ -37,7 +35,8 @@ async def create_reservation(
             user = await User.get(reservation_in.user_id, session=db)
             if not user:
                 not_found("User")
-            return await Reservation.create(db, **reservation_in.model_dump())
+            reservation = await Reservation.create(db, **reservation_in.model_dump())
+            return schemas.ReservationSchema.from_orm(reservation)
         else:
             guest = await create_guest(db, reservation_in.email)
 
@@ -45,7 +44,17 @@ async def create_reservation(
             reservation_data.pop("email")
             reservation_data["user_id"] = guest.id
 
-            return await Reservation.create(db, **reservation_data)
+            reservation = await Reservation.create(db, **reservation_data)
+            return schemas.ReservationGuestSchema(
+                number_of_tickets=reservation.number_of_tickets,
+                status=reservation.status,
+                paid=reservation.paid,
+                user_id=guest.id,
+                conference_id=reservation.conference_id,
+                username=guest.name,
+                email=guest.email,
+                password=guest.name,  ##username == password
+            )
 
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
