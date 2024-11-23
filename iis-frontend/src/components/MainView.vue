@@ -12,23 +12,30 @@ import router, { logout} from "@/router";
   <v-navigation-drawer v-model="navigationDrawer">
     <!-- -->
     <v-list>
+      <v-list-subheader>Uživatel</v-list-subheader>
+      <v-list-item link prepend-icon="mdi-ticket" @click="router.push('/main/tickets')">
+        Vstupenky
+      </v-list-item>
+      <v-list-subheader>Pořadatel</v-list-subheader>
       <v-list-item link prepend-icon="mdi-account-group" @click="router.push('/main/conferences')">
         Konference
       </v-list-item>
       <v-list-item link prepend-icon="mdi-office-building" @click="router.push('/main/rooms')">
         Místnosti
       </v-list-item>
-      <v-list-item link prepend-icon="mdi-account" @click="router.push('/main/users')">
-        Uživatelé
-      </v-list-item>
       <v-list-item link prepend-icon="mdi-calendar" @click="router.push('/main/reservations')">
         Rezervace
       </v-list-item>
-      <v-list-item link prepend-icon="mdi-ticket" @click="router.push('/main/tickets')">
-        Vstupenky
-      </v-list-item>
       <v-list-item link prepend-icon="mdi-star" @click="router.push('/main/voting')">
         Hlasování
+      </v-list-item>
+      <v-list-subheader>Přednášející</v-list-subheader>
+      <v-list-item link prepend-icon="mdi-presentation" @click="router.push('/main/presentations')">
+        Prezentace
+      </v-list-item>
+      <v-list-subheader>Admin</v-list-subheader>
+      <v-list-item link prepend-icon="mdi-account" @click="router.push('/main/users')">
+        Uživatelé
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
