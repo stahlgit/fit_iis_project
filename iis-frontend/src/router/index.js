@@ -2,7 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import axios from 'axios'
 
-export const API_BASE_URL = 'http://164.92.232.11/'
+export const API_BASE_URL = 'http://164.92.232.11:8000/'
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -117,7 +117,6 @@ export async function register(username, email,password) {
 
     const loginSuccess = await login(email, password);
     if(loginSuccess) {
-      await router.push('/main');
       return true;
     }
     else {

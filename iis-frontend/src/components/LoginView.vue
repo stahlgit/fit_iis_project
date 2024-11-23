@@ -31,7 +31,7 @@ const emailRules = [
 
 </script>
 
-<template>await
+<template>
   <v-container>
     <v-snackbar
       v-model="snackbar"

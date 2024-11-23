@@ -10,13 +10,36 @@ defineProps({
 const dialog = ref(false)
 
 const conference = ref({"name":"Nazev konference","description":"Popis Konference","genre":"Zanr","place":"Misto","start_time":"2024-11-20T22:39:44.555000","end_time":"2024-11-20T22:39:44.555000","price":0.0,"capacity":0,"id":1})
+
+const newReservation = ref({
+  "number_of_tickets": 0,
+  "status": "string",
+  "paid": true,
+  "user_id": 0,
+  "conference_id": 0,
+  })
+
+const username = ref("");
+const mail = ref("");
 </script>
 
 <template>
   <v-dialog v-model="dialog" max-width="600px">
     <v-card title="Rezervace vstupenek">
       <v-card-text>
-        <v-text-field title="počet vstupenek"/>
+        <div class="d-flex">
+          <v-text-field disabled v-model="newReservation.number_of_tickets" label="Počet vstupenek"></v-text-field>
+          <v-btn-group>
+            <v-btn icon @click="newReservation.number_of_tickets > 0 ? newReservation.number_of_tickets-- : null">
+              <v-icon>mdi-minus</v-icon>
+            </v-btn>
+            <v-btn icon @click="newReservation.number_of_tickets++">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-btn-group>
+        </div>
+        <v-text-field label="Jméno" v-model="username"/>
+        <v-text-field label="E-mail" v-model="mail"/>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
