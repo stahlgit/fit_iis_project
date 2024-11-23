@@ -1,10 +1,18 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
-import Root from '../components/HelloWorld.vue'
 import axios from 'axios'
-import { ca } from 'vuetify/locale'
 
-const API_BASE_URL = 'http://localhost:8000/'
+export const API_BASE_URL = 'http://164.92.232.11/'
+
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+});
+
+export { axiosInstance }
 
 const routes = [
   {
@@ -62,7 +70,13 @@ const routes = [
   {
     path: '/public',
     name: 'Public',
-    component: () => import('../components/PublicView.vue'),
+    component: () => import('../components/PublicView.vue')
+  },
+  {
+    path: '/public/conference/:id',
+    name: 'PublicDetail',
+    component: () => import('../components/PublicDetailView.vue'),
+    props: true
   }
   ]
 
@@ -75,7 +89,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('authToken')
   console.log('Token:', token)
-  if (to.name !== 'Login' && to.name !== 'Register' && to.name !== 'Public' && !token) {
+  if (to.name !== 'Login' && to.name !== 'Register' && to.name !== 'Public' && to.name !== 'PublicDetail' && !token) {
     next({ name: 'Login' })
   } else {
     next()
@@ -83,7 +97,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export async function register(username, email,password) {
-  const url = 'http://localhost:8000/user/register';
+  const url = API_BASE_URL + 'user/register';
 
   const userData = {
     name: username,
@@ -129,7 +143,7 @@ export async function register(username, email,password) {
 
 
 export async function login(username, password) {
-  const url = 'http://localhost:8000/user/token';
+  const url = API_BASE_URL + 'user/token';
 
   // Form data as a URL-encoded string
   const formData = new URLSearchParams();
