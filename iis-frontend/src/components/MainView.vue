@@ -5,6 +5,7 @@ import { ref } from 'vue';
 const navigationDrawer = ref(false);
 
 import router, { logout} from "@/router";
+const userRole = ref(localStorage.getItem('role'));
 
 </script>
 
@@ -33,10 +34,12 @@ import router, { logout} from "@/router";
       <v-list-item link prepend-icon="mdi-presentation" @click="router.push('/main/presentations')">
         Prezentace
       </v-list-item>
-      <v-list-subheader>Admin</v-list-subheader>
-      <v-list-item link prepend-icon="mdi-account" @click="router.push('/main/users')">
-        Uživatelé
-      </v-list-item>
+      <template v-if="userRole === 'admin'">
+        <v-list-subheader>Admin</v-list-subheader>
+        <v-list-item link prepend-icon="mdi-account" @click="router.push('/main/users')">
+          Uživatelé
+        </v-list-item>
+      </template>
     </v-list>
   </v-navigation-drawer>
   <v-app-bar>

@@ -51,7 +51,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = await crud.create_access_token(data={"sub": user.name})
-    return schemas.Token(access_token=access_token, token_type="bearer")
+    return schemas.Token(access_token=access_token, token_type="bearer", role=user.role)
 
 
 @router.get("/me", response_model=schemas.UserSchema)
@@ -90,7 +90,7 @@ async def get_all_users(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.put("register_guest", response_model=schemas.UserSchema)
+@router.put("/register_guest", response_model=schemas.UserSchema)
 @log_endpoint
 async def register_guest(
     user_in: schemas.UserCreate,
