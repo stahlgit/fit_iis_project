@@ -4,11 +4,12 @@ import { axiosInstance } from "@/router";
 
 const loading = ref(false);
 const users = ref([]);
+const selectedUser = ref(null);
+const dialog = ref(false);
 
 function fetchUsers() {
     loading.value = true;
 
-    // Retrieve the token from localStorage
     const token = localStorage.getItem('authToken');
     axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
@@ -21,19 +22,70 @@ function fetchUsers() {
         })
         .finally(() => {
             loading.value = false;
-            console.log(users.value);
         });
 }
 
 onMounted(() => {
     fetchUsers();
 });
+
+function openEditDialog(user) {
+    selectedUser.value = { ...user }; // Create a copy of the user data
+    dialog.value = true; // Open the dialog
+}
+
+function saveUserChanges() {
+    if (!selectedUser.value) return;
+
+    const token = localStorage.getItem('authToken');
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    axiosInstance.put(`user/${selectedUser.value.id}`, selectedUser.value)
+        .then(response => {
+            // Update the user list with the modified user
+            const index = users.value.findIndex(user => user.id === response.data.id);
+            if (index !== -1) {
+                users.value[index] = response.data;
+            }
+            dialog.value = false; // Close the dialog
+        })
+        .catch(error => {
+            console.error("Error updating user:", error.response ? error.response.data : error.message);
+        });
+}
+
+
 </script>
 
 <template>
-  <v-dialog v-model="dialog">
+  <v-dialog v-model="dialog" max-width="500px">
     <v-card>
-      <!-- Your dialog content goes here -->
+      <v-card-title>Edit User</v-card-title>
+      <v-card-text>
+        <v-form>
+          <v-text-field
+            label="Name"
+            v-model="selectedUser.name"
+            outlined
+          ></v-text-field>
+          <v-text-field
+            label="Email"
+            v-model="selectedUser.email"
+            outlined
+          ></v-text-field>
+          <v-select
+            label="Role"
+            v-model="selectedUser.role"
+            :items="['ADMIN', 'REGISTERED', 'GUEST']"
+            outlined
+          ></v-select>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="dialog = false">Cancel</v-btn>
+        <v-btn color="primary" text @click="saveUserChanges">Save</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 
@@ -45,8 +97,11 @@ onMounted(() => {
     <v-list>
       <v-list-item v-for="user in users" :key="user.id">
         <v-card>
-          <v-list-item-title>{{ user.name }}</v-list-item-title> <!-- Corrected from conference.name -->
-          <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle> <!-- Added user.email -->
+          <v-list-item-title>{{ user.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+          <v-list-item-action>
+            <v-btn @click="openEditDialog(user)">Edit</v-btn> <!-- Call openEditDialog with the user -->
+          </v-list-item-action>
         </v-card>
       </v-list-item>
     </v-list>
