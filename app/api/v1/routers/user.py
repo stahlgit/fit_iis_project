@@ -8,6 +8,7 @@ from app.api.crud import user as crud
 from app.api.models import User, UserRole
 from app.api.v1.schemas import user as schemas
 from app.services import config, get_db, log_endpoint
+from app.services.utils import not_found
 
 router = APIRouter(
     prefix="/user",
@@ -87,6 +88,33 @@ async def get_all_users(
         return await User.get_all(db)
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
+
+
+@router.put("register_guest", response_model=schemas.UserSchema)
+@log_endpoint
+async def register_guest(
+    user_in: schemas.UserCreate,
+    guest_name: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        if await User.get_by(db, name=user_in.name):
+            raise HTTPException(status_code=400, detail="Username already registered")
+        db_user = await User.get_one_by(db, email=user_in.email)
+        if db_user:
+            if db_user.email == user_in.email and db_user.role == UserRole.GUEST:
+                user = await User.get_one_by(db, name=guest_name)
+                if not user:
+                    not_found("Guest")
+                if user.role == UserRole.ADMIN:
+                    raise HTTPException(
+                        status_code=400, detail="User cannot assign admin"
+                    )
+                return await User.update(db, id=user.id, **user_in.dict())
+            else:
+                raise HTTPException(status_code=400, detail="Email already registered")
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
 
 
 ## THIS WILL BE DELETED LATER
