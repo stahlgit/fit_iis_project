@@ -13,7 +13,17 @@ const axiosInstance = axios.create({
   },
 });
 
-export { axiosInstance }
+const authentiatedAxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+  },
+});
+
+
+export { axiosInstance, authentiatedAxiosInstance };
 
 const routes = [
   {
@@ -109,6 +119,7 @@ export async function register(username, email,password) {
     name: username,
     email: email,
     password: password,
+    role: "registered"
   };
 
   try {

@@ -1,15 +1,17 @@
 <script setup>
 // url props
-import router from "@/router";
-import {ref} from "vue";
+import router, {authentiatedAxiosInstance, axiosInstance, isLoggedIn} from "@/router";
+import {onMounted, ref} from "vue";
 
-defineProps({
+const props = defineProps({
   id: String
 })
 
 const dialog = ref(false)
 
-const conference = ref({"name":"Nazev konference","description":"Popis Konference","genre":"Zanr","place":"Misto","start_time":"2024-11-20T22:39:44.555000","end_time":"2024-11-20T22:39:44.555000","price":0.0,"capacity":0,"id":1})
+const conference = ref({})
+const me = ref({})
+const showGuestReservationConfirmation = ref(false);
 
 const newReservation = ref({
   "number_of_tickets": 0,
@@ -21,6 +23,75 @@ const newReservation = ref({
 
 const username = ref("");
 const mail = ref("");
+
+async function getMyDetails() {
+  try {
+    const response = await authentiatedAxiosInstance.get(`/user/me`);
+    me.value = response.data;
+
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  }
+}
+
+async function getEnrichedConference(id) {
+  try {
+    const response = await axiosInstance.get(`/conferences/${id}`);
+    conference.value = response.data;
+    const response2 = await axiosInstance.get(`/conferences/${id}/available`);
+    conference.value.freeCapacity = response2.data.available;
+  } catch (error) {
+    console.error('Error fetching conference:', error);
+  }
+}
+
+async function doReservation() {
+  console.log('doReservation')
+  // for guest users
+  if (!isLoggedIn) {
+    console.log('not logged in')
+    // create user
+    // create reservation
+    try {
+      const response = await authentiatedAxiosInstance.post(`/reservation`, {
+        "number_of_tickets": newReservation.value.number_of_tickets,
+        "paid": false,
+        "conference_id": props.id,
+        "email": me.value.email
+      });
+      console.log(response.data);
+      newReservation.value = response.data;
+      showGuestReservationConfirmation.value = true;
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+    }
+  }
+
+  // for logged in users
+  else {
+    console.log('logged in')
+    // create reservation
+    try {
+      const response = await authentiatedAxiosInstance.post(`/reservation`, {
+        "number_of_tickets": newReservation.value.number_of_tickets,
+        "paid": false,
+        "conference_id": props.id,
+        "user_id": me.value.id
+      });
+      console.log(response.data);
+      newReservation.value = response.data;
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+    }
+
+  }
+}
+
+onMounted(() => {
+  getEnrichedConference(props.id);
+  getMyDetails();
+  console.log("Conference fetched")
+})
 </script>
 
 <template>
@@ -33,18 +104,28 @@ const mail = ref("");
             <v-btn icon @click="newReservation.number_of_tickets > 0 ? newReservation.number_of_tickets-- : null">
               <v-icon>mdi-minus</v-icon>
             </v-btn>
-            <v-btn icon @click="newReservation.number_of_tickets++">
+            <v-btn icon @click="newReservation.number_of_tickets < conference.freeCapacity ? newReservation.number_of_tickets++ : null">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </v-btn-group>
         </div>
-        <v-text-field label="Jméno" v-model="username"/>
-        <v-text-field label="E-mail" v-model="mail"/>
+        <div v-if="!isLoggedIn">
+          <v-text-field label="Jméno" v-model="username"/>
+          <v-text-field label="E-mail" v-model="mail"/>
+        </div>
+        <div>
+          <v-banner>
+            Jste přihlášen jako {{me.name}} s emailem {{me.email}}.
+          </v-banner>
+          <v-banner color="success" v-show="showGuestReservationConfirmation">
+            Děkujeme za rezervaci vstupenek na konferenci {{conference.name}}. Na email {{me.email}} vám byla zaslána potvrzovací zpráva.
+          </v-banner>
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="dialog = false">
-          Zavřít
+        <v-btn color="blue darken-1" @click="() => { doReservation(); dialog = false; }">
+          Odeslat
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -61,9 +142,9 @@ const mail = ref("");
         {{conference.place}}
       </v-chip>
       <v-chip prepend-icon="mdi-account-group">
-        {{conference.capacity}}
+        {{conference.freeCapacity}} volných míst
       </v-chip>
-      <v-chip prepend-icon="mdi-account-group">
+      <v-chip prepend-icon="mdi-presentation">
         {{conference.genre}}
       </v-chip>
     </div>
