@@ -34,11 +34,11 @@ usecase "Remove Presentation" as UC8
 usecase "Add Presentation" as UC9
 usecase "Ask Questions" as UC10
 usecase "Vote for Presentation" as UC11
-usecase "Make Reservation" as UC12
-usecase "Pay for Reservation" as UC13
 
 
 ' GUEST
+usecase "Make Reservation" as UC12
+usecase "Pay for Reservation" as UC13
 usecase "View Conferences" as UC14
 usecase "View Conference Time Schedule" as UC15
 usecase "View Conference Capacity" as UC16
