@@ -84,7 +84,7 @@ const usernameRules = [
         <v-form>
           <v-text-field
             v-model="username"
-            label="Uživatelské jméno"
+            label="Jméno"
             :rules="usernameRules"
             :error-messages="[usernameError]"
 

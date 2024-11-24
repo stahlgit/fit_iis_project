@@ -22,6 +22,7 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     name: str
     email: str
+    role: UserRole
 
 
 class UserCreate(UserBase):
@@ -57,3 +58,4 @@ class UserSchema(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str

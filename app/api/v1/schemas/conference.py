@@ -22,7 +22,7 @@ class ConferenceBase(BaseModel):
 
 
 class ConferenceCreate(ConferenceBase):
-    pass
+    organizer_id: int
 
 
 class ConferenceUpdate(BaseModel):
@@ -33,6 +33,7 @@ class ConferenceUpdate(BaseModel):
     time_interval: Optional[str] = None
     price: Optional[float] = None
     capacity: Optional[int] = None
+    organizer_id: Optional[int] = None
 
 
 class ConferenceSchema(ConferenceBase):
@@ -40,3 +41,7 @@ class ConferenceSchema(ConferenceBase):
 
     class Config:
         from_attributes = True
+
+
+class ConferenceAvailableSpaces(BaseModel):
+    available: int

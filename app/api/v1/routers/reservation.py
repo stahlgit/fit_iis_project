@@ -1,12 +1,14 @@
-from typing import List
+from typing import List, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from app.api.models import Reservation
+from app.api.crud.user import create_guest
+from app.api.models import Conference, Reservation, User
 from app.api.v1.schemas import reservation as schemas
-from app.services import get_db, log_endpoint, not_found
+from app.api.v1.schemas.user import UserSchema
+from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
     prefix="/reservation",
@@ -15,26 +17,54 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/", response_model=schemas.ReservationSchema, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 @log_endpoint
 async def create_reservation(
-    reservation_in: schemas.ReservationCreateSchema, db: Session = Depends(get_db)
-):
+    reservation_in: schemas.ReservationCreateSchema,
+    db: Session = Depends(get_db),
+) -> schemas.ReservationSchema:
     try:
-        if await Reservation.get_by(db, name=reservation_in.name):
-            raise HTTPException(
-                status_code=400, detail="Reservation already registered"
+        await check_entities_exist(
+            db,
+            {
+                "conference": [reservation_in.conference_id],
+            },
+        )
+
+        if reservation_in.user_id is not None:
+            user = await User.get(reservation_in.user_id, session=db)
+            if not user:
+                not_found("User")
+            reservation = await Reservation.create(db, **reservation_in.model_dump())
+            return schemas.ReservationSchema.from_orm(reservation)
+        else:
+            guest = await create_guest(db, reservation_in.email)
+
+            reservation_data = reservation_in.model_dump()
+            reservation_data.pop("email")
+            reservation_data["user_id"] = guest.id
+
+            reservation = await Reservation.create(db, **reservation_data)
+            return schemas.ReservationGuestSchema(
+                number_of_tickets=reservation.number_of_tickets,
+                status=reservation.status,
+                paid=reservation.paid,
+                user_id=guest.id,
+                conference_id=reservation.conference_id,
+                username=guest.name,
+                email=guest.email,
+                password=guest.name,  ##username == password
             )
-        return await Reservation.create(db, **reservation_in.model_dump())
+
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
 
 @router.get("/all", response_model=List[schemas.ReservationSchema])
 @log_endpoint
-async def read_reservations(db: Session = Depends(get_db)):
+async def read_reservations(
+    db: Session = Depends(get_db),
+) -> List[schemas.ReservationSchema]:
     try:
         return await Reservation.get_all(db)
     except Exception as e:

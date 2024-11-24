@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -8,6 +8,7 @@ from app.api.crud import user as crud
 from app.api.models import User, UserRole
 from app.api.v1.schemas import user as schemas
 from app.services import config, get_db, log_endpoint
+from app.services.utils import not_found
 
 router = APIRouter(
     prefix="/user",
@@ -50,7 +51,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = await crud.create_access_token(data={"sub": user.name})
-    return schemas.Token(access_token=access_token, token_type="bearer")
+    return schemas.Token(access_token=access_token, token_type="bearer", role=user.role)
 
 
 @router.get("/me", response_model=schemas.UserSchema)
@@ -75,6 +76,76 @@ async def set_user_role(
             status_code=400, detail="Error occured while setting user role"
         )
     return user
+
+
+@router.get("/all", response_model=List[schemas.UserSchema])
+@log_endpoint
+async def get_all_users(
+    current_user: User = Depends(crud.role_required(UserRole.ADMIN)),
+    db: Session = Depends(get_db),
+) -> List[schemas.UserSchema]:
+    try:
+        return await User.get_all(db)
+    except Exception as e:
+        raise HTTPException(400, f"Error occurred: {e}")
+
+
+@router.put("/register_guest", response_model=schemas.UserSchema)
+@log_endpoint
+async def register_guest(
+    user_in: schemas.UserCreate,
+    guest_name: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        if await User.get_by(db, name=user_in.name):
+            raise HTTPException(status_code=400, detail="Username already registered")
+        db_user = await User.get_one_by(db, email=user_in.email)
+        if db_user:
+            if db_user.email == user_in.email and db_user.role == UserRole.GUEST:
+                user = await User.get_one_by(db, name=guest_name)
+                if not user:
+                    not_found("Guest")
+                if user.role == UserRole.ADMIN:
+                    raise HTTPException(
+                        status_code=400, detail="User cannot assign admin"
+                    )
+                return await User.update(db, id=user.id, **user_in.dict())
+            else:
+                raise HTTPException(status_code=400, detail="Email already registered")
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.get("/{user_id}", response_model=schemas.UserSchema)
+@log_endpoint
+async def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        user = await User.get_one_by(db, id=user_id)
+        if not user:
+            not_found("User")
+        return schemas.UserSchema(**user.__dict__)
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.put("/{user_id}", response_model=schemas.UserSchema)
+@log_endpoint
+async def update_user(
+    user_id: int,
+    user_in: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+):
+    try:
+        user = await User.get_one_by(db, id=user_id)
+        if not user:
+            not_found("User")
+        return await User.update(db, id=user_id, **user_in.dict())
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
 
 
 ## THIS WILL BE DELETED LATER
