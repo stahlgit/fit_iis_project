@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from app.api.crud.user import create_guest
-from app.api.models import Conference, Reservation, User
+from app.api.crud.user import create_guest, role_required
+from app.api.models import Conference, Reservation, User, UserRole
 from app.api.v1.schemas import reservation as schemas
 from app.api.v1.schemas.user import UserSchema
 from app.services import check_entities_exist, get_db, log_endpoint, not_found
@@ -82,6 +82,25 @@ async def read_reservation(reservation_id: int, db: AsyncSession = Depends(get_d
         if not reservation:
             not_found("Reservation")
         return schemas.ReservationSchema(**reservation.__dict__)
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
+@router.get("/user/{user_id}", response_model=List[schemas.ReservationSchema])
+@log_endpoint
+async def get_user_reservations(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.ReservationSchema]:
+    try:
+        reservations = await Reservation.get_by(db, user_id=user_id)
+        if not reservations:
+            not_found("Reservation")
+        return [
+            schemas.ReservationSchema(**reservation.__dict__)
+            for reservation in reservations
+        ]
     except Exception as e:
         raise HTTPException(400, f"Error occured: {e}")
 
