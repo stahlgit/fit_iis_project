@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 
 const myTickets = ref([]);
 
-
+// todo show pending reservations and confirmed tickets
 </script>
 
 <template>

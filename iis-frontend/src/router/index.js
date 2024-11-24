@@ -205,7 +205,7 @@ export async function logout() {
 }
 
 export function isLoggedIn() {
-  return localStorage.getItem('authToken') !== null
+  return localStorage.getItem('authToken') != null
 }
 
 // Workaround for https://github.com/vitejs/vite/issues/11804

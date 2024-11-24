@@ -12,6 +12,7 @@ const dialog = ref(false)
 const conference = ref({})
 const me = ref({})
 const showGuestReservationConfirmation = ref(false);
+const showUserReservationConfirmation = ref(false);
 
 const newReservation = ref({
   "number_of_tickets": 0,
@@ -48,7 +49,7 @@ async function getEnrichedConference(id) {
 async function doReservation() {
   console.log('doReservation')
   // for guest users
-  if (!isLoggedIn) {
+  if (!isLoggedIn()) {
     console.log('not logged in')
     // create user
     // create reservation
@@ -80,6 +81,7 @@ async function doReservation() {
       });
       console.log(response.data);
       newReservation.value = response.data;
+      showUserReservationConfirmation.value = true;
     } catch (error) {
       console.error('Error creating reservation:', error);
     }
@@ -115,16 +117,22 @@ onMounted(() => {
         </div>
         <div>
           <v-banner>
-            Jste přihlášen jako {{me.name}} s emailem {{me.email}}.
+            Jste přihlášen jako <v-kbd>{{me.name}}</v-kbd> s emailem <v-kbd>{{me.email}}</v-kbd>.
           </v-banner>
-          <v-banner color="success" v-show="showGuestReservationConfirmation">
-            Děkujeme za rezervaci vstupenek na konferenci {{conference.name}}. Na email {{me.email}} vám byla zaslána potvrzovací zpráva.
+          <v-banner icon="mdi-check" color="success" v-show="showGuestReservationConfirmation">
+            Děkujeme za rezervaci vstupenek na konferenci.<br> Na email {{me.email}} vám byla zaslána potvrzovací zpráva.
+          </v-banner>
+          <v-banner icon="mdi-check" color="success" v-show="showUserReservationConfirmation">
+            Děkujeme za rezervaci vstupenek na konferenci.<br> Rezervaci najdete ve svém účtu.
           </v-banner>
         </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="() => { doReservation(); dialog = false; }">
+        <v-btn @click="dialog = false">
+          Zavřít
+        </v-btn>
+        <v-btn :disabled="showGuestReservationConfirmation || showUserReservationConfirmation" color="blue darken-1" @click="() => { doReservation(); }">
           Odeslat
         </v-btn>
       </v-card-actions>

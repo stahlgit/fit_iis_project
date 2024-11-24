@@ -63,7 +63,7 @@ async function getEnrichedConferences() {
       Konference
     </v-app-bar-title>
     <v-spacer/>
-    <v-btn v-if="isLoggedIn" to="/main" prepend-icon="mdi-account">
+    <v-btn v-if="isLoggedIn()" to="/main" prepend-icon="mdi-account">
       Můj účet
     </v-btn>
     <v-btn v-else to="/login">
@@ -74,7 +74,7 @@ async function getEnrichedConferences() {
   <v-progress-linear indeterminate v-if="loading" ></v-progress-linear>
 
   <div class="d-flex flex-wrap justify-center" style="flex: 1 1 30%" v-if="conferences.length > 0">
-    <v-card v-for="conference in conferences" :key="conference.id" :title="conference.name" :subtitle=" conference.capacity - conference.freeCapacity + ' volných míst z ' + conference.capacity">
+    <v-card v-for="conference in conferences" :key="conference.id" :title="conference.name" :subtitle="conference.freeCapacity + ' volných míst, ' + conference.capacity + ' celkem'">
       <v-card-text>
         {{ conference.description }}
       </v-card-text>
@@ -85,7 +85,7 @@ async function getEnrichedConferences() {
       </v-card-actions>
     </v-card>
   </div>
-  <div v-else>
+  <div v-else-if="!loading">
     <div class="text-center my-10">
       Zatím nejsou žádné konference
     </div>
