@@ -7,6 +7,7 @@
     	table { border-collapse: collapse; }
     	td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
     	dt { font-weight: bold; margin-top: 0.5em; }
+		.images { text-align:center; margin-left: auto; margin-right: auto; display: block; }
     </style>
 </head>
 
@@ -22,32 +23,41 @@
 </dl>
 
 <h2>Uživatelé systému pro testování</h2>
-<table>
-<tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
-<tr><td>admin@example.cz</td><td>123456789</td><td>ADMIN</td></tr>
-<tr><td>jan.novak@example.cz</td><td>123456789</td><td>REGISTERED</td></tr>
-<tr><td>guest@example.cz</td><td></td><td>GUEST</td></tr>
-</tbody></table>
-<p><img style="margin-left: auto; margin-right: auto; display: block; width: 25%; height: auto;" src="uc.png" alt="uc-diagram:uc.png"></p>
+<table style="margin-left:auto;margin-right:auto;">
+	<tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+	<tr><td>admin@example.cz</td><td>123456789</td><td>ADMIN</td></tr>
+	<tr><td>jan.novak@example.cz</td><td>123456789</td><td>REGISTERED</td></tr>
+	<tr><td>guest@example.cz</td><td></td><td>GUEST</td></tr>
+	</tbody>
+</table>
+<div class="images">
+	<p>Obr. č. 1 -  Diagram případů užití (UC)</p>
+	<img style="width: 25%; height: auto;" src="uc.png" alt="uc-diagram:uc.png"></img>
+</div>
 
 <h3>Video</h3>
 <p>Viz old.html a zadani, hlavne se zamerit na UC. <a href="youtube.com">youtube.com</a></p>
 <strong>TODO</strong>
 
 <h2>Implementace</h2>
-<p>Viz old.html odkazy na soubory co je kde imlementovane. Bonus technologie a odkzy na github.</p>
+<p>Projekt byl při rozdělování práce dekomponován na BE který je implementován ve složce <a href="../app/">app/</a> a na FE, ten je implementován odděleně ve složce <a href="../iis-frontend/">iis-frontend</a>. Tyto části se po specifikaci API na pravidelných týdeních schůzkách vyvýjely samostatně.</p>
+<p>Pro implementaci BE byla použita databáze Postgresql a Python framework Fast-Api. Tyto moduly byly už při vývoji zabaleny do docker kontejnerů takže bylo jednoduše dosaženo stejného vývojového prostředí bez nutnosti instalace databáze. Model databáze je implementován v <a href="../app/api/models.py">app/api/models.py</a> a byl migrován nástrojem Alembic. Komnikaci mezi Python aplikací a databázovým systémem zařizovalo ORM SQLAlchemy <a href="../app/api/base.py">app/api/base.py</a>. Používané endpointy a schémata jsou implementovány v <a href="../app/api/v1/">app/api/v1/</a> a crud operace v <a href="../app/api/crud/">app/api/crud/</a>. Kód obstarávající jiné služby je pak k nalezení v <a href="../app/services/">app/services/</a>.</p>
+<p>Samostatně implementovaný byl FE v Javascriptu s použitím frameworku Vue.js.</p>
 <strong>TODO</strong>
 
 <h3>Databáze</h3>
-<p><img style="margin-left: auto; margin-right: auto; display: block; width:40%; height: auto;" src="er.png" alt="er-diagram:er.png"></img></p>
+<div class="images">
+	<p>Obr. č. 2 - Diagram relačních závislostí (ER)</p>
+	<img style="width:40%; height: auto;" src="er.png" alt="er-diagram:er.png"></img>
+</div>
 
 <h2>Instalace</h2>
-Požadované nástroje: python 3.12, poetry, docker, uvicorn
-<ul>
-<li>1. mv .env.example .env</li>
-<li>2. poetry shell</li>
-<li>3. make build</li>
-</ul>
+Požadované nástroje: python 3.12, poetry, docker, uvicorn. Je dobrým zvykem použít vlastní nastavení prostředí, pro testování je možné použít vzor: <code>mv .env.example .env</code>
+<ol>
+	<li><code>vim .env</code></li>
+	<li><code>poetry shell</code></li>
+	<li><code>make build</code></li>
+</ol>
 
 <h2>Známé problémy</h2>
 <p>Žádné.</p>
