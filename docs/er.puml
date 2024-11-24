@@ -1,101 +1,112 @@
-@startuml er
+@startuml
 
-entity "Konference" {
-  +id: int <<PK>>
-  ---
-  +název: String
-  +popis: String
-  +žánr: String
-  +místo: String
-  +časový_interval: DateTimeRange
-  +cena: Float
-  +kapacita: int
+enum user_role {
+    ADMIN
+    REGISTERED
+    GUEST
 }
 
-entity "Místnost" {
-  +id: int <<PK>>
-  ---
-  +název: String
-  +kapacita: int
-  +konference_id: int <<FK>>
+entity conferences {
+    +<<pk>> id : int
+	---
+    +name : string
+    +description : string?
+    +genre : string?
+    +place : string?
+    +start_time : datetime
+    +end_time : datetime
+    +price : float?
+    +capacity : int?
 }
 
-entity "Přednáška" {
-  +id: int <<PK>>
-  ---
-  +název: String
-  +přednášející: int <<FK>>
-  +popis: String
-  +čas: DateTimeRange
-  +místnost_id: int <<FK>>
-  +konference_id: int <<FK>>
-  +tagy: String
-  +obrázek: String
+entity users {
+    +<<pk>> id : int
+	---
+    +name : string
+    +email : string
+    +role : user_role
+    +hashed_password : string
+    +is_active : bool = false
+    +is_superuser : bool = false
 }
 
-entity "Uživatel" {
-  +id: int <<PK>>
-  ---
-  +jméno: String
-  +email: String
-  +hash: String
-  +role: String
+entity rooms {
+    +<<pk>> id : int
+	---
+    +name : string
+    +capacity : int?
+    +conference_id : int
 }
 
-entity "Rezervace" {
-  +id: int <<PK>>
-  ---
-  +uživatel_id: int <<FK>>
-  +konference_id: int <<FK>>
-  +počet_vstupenek: int
-  +stav: String
-  +uhrazeno: Boolean
+entity reservations {
+    +<<pk>> id : int
+	---
+    +number_of_tickets : int
+    +status : string?
+    +paid : bool
+    +user_id : int?
+    +conference_id : int
 }
 
-entity "Podaná prezentace" {
-  +id: int <<PK>>
-  ---
-  +uživatel_id: int <<FK>>
-  +konference_id: int <<FK>>
-  +návrh_prezentace: String
-  +stav: String
+entity tickets {
+    +<<pk>> id : int
+	---
+    +created_at : datetime
+    +reservation_id : int
 }
 
-entity "Vstupenka" {
-  +id: int <<PK>>
-  ---
-  +rezervace_id: int <<FK>>
-  +vytvořeno: DateTime
+entity lectures {
+    +<<pk>> id : int
+	---
+    +name : string
+    +description : string?
+    +start_time : datetime
+    +end_time : datetime
+    +tags : string?
+    +image : string?
+    +room_id : int
+    +conference_id : int
+    +lecturer_id : int
 }
 
-entity "Hlasování" {
-  +id: int <<PK>>
-  ---
-  +uživatel_id: int <<FK>>
-  +prezentace_id: int <<FK>>
-  +hodnocení: int
+entity given_presentation {
+    +<<pk>> id : int
+	---
+    +user_id : int
+    +conference_id : int
+    +proposal : string?
+    +status : string
 }
 
-entity "Otázka" {
-  +id: int <<PK>>
-  ---
-  +uživatel_id: int <<FK>>
-  +prezentace_id: int <<FK>>
-  +text: String
+entity voting {
+    +<<pk>> id : int
+	---
+    +user_id : int
+    +lecture_id : int
+    +rating : int
 }
 
-' Kardinality pomocí Crow's Foot notace
+entity questions {
+    +<<pk>> id : int
+	---
+    +text : string
+    +user_id : int
+    +lecture_id : int
+}
 
-Uživatel ||--o{ Rezervace : "provádí"
-Konference ||--o{ Rezervace : "obsahuje"
-Uživatel ||--o{ "Podaná prezentace" : "registruje"
-Konference ||--o{ "Podaná prezentace" : "obsahuje"
-Místnost ||--o{ Přednáška : "obsahuje"
-Konference ||--o{ Místnost : "má"
-Přednáška ||--o{ Hlasování : "hodnocena"
-Přednáška ||--o{ Otázka : "má"
-Konference ||--o{ Přednáška : "je součástí"
-Uživatel ||--o{ Přednáška : "přednáší na"
-Vstupenka }o--|| Rezervace : "patří k"
+conferences |o--o{ rooms
+conferences ||--o{ lectures
+conferences ||--o{ reservations
+conferences ||--o{ given_presentation
+users |o--o{ conferences
+users |o--o{ reservations
+users ||--o{ lectures
+users ||--o{ voting
+users ||--o{ questions
+users ||--o{ given_presentation
+rooms ||--o{ lectures
+reservations ||--o{ tickets
+lectures ||--o{ voting
+lectures ||--o{ questions
 
 @enduml
