@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import axios from 'axios'
 import { setUserRole } from '@/services/utils';
 
-export const API_BASE_URL = 'http://164.92.232.11:8000/'
+export const API_BASE_URL = 'http://localhost:8000/'
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -11,6 +11,16 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+});
+
+axiosInstance.interceptors.request.use(config => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers['Authorization']= `Bearer ${token}`;
+  }
+  return config;
+}, error => {
+  return Promise.reject(error);
 });
 
 export { axiosInstance }
