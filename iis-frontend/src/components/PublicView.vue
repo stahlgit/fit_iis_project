@@ -47,7 +47,6 @@ async function getEnrichedConferences() {
 
     conferences.value = conferencesData;
     loading.value = false;
-    console.log('Conferences fetched:', conferencesData);
   } catch (error) {
     console.error('Error fetching conferences:', error);
     conferences.value = [];

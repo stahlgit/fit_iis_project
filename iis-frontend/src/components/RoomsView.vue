@@ -25,6 +25,7 @@ async function getUserRooms(conferences) {
       conferenceRoomMap.push({ conference, rooms: filteredRooms });
     } catch (error) {
       console.error(error);
+      return [];
     }
   }
   return conferenceRoomMap;
@@ -53,7 +54,6 @@ async function getUser() {
     console.error("Error fetching user data:", error);
   } finally {
     loading.value = false; // Set loading to false after fetching data
-    console.log(currentAccount.value);
   }
 }
 
@@ -91,7 +91,6 @@ async function createRoom() {
       capacity: newRoom.value.capacity,
       conference_id: newRoom.value.conference_id.id,
     });
-
 
     console.log('Room created:', response.data);
     closeDialogs();
