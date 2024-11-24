@@ -52,7 +52,8 @@ onMounted(()=>{
 </script>
 
 <template>
-  <div v-if="myReservations.length === 0" class="mx-auto text-center">
+  <div v-if="loading">Loading...</div>
+  <div v-else-if="myReservations.length === 0" class="mx-auto text-center">
     Ještě neporádáte žádné konference
   </div>
   <v-list v-else>
@@ -73,5 +74,4 @@ onMounted(()=>{
 </template>
 
 <style scoped lang="sass">
-
 </style>
