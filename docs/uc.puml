@@ -1,46 +1,70 @@
 @startuml
 left to right direction
 
-actor Administrator
-actor RegisteredUser
-actor UnregisteredUser
+actor ADMIN
+actor REGISTERED
+actor GUEST
 
-rectangle "Konference - plánovací systém" {
+rectangle "Conference planning system" {
 
+' ADMIN
 usecase "Manage Users" as UC1
-usecase "Create Conference" as UC2
-usecase "Manage Rooms" as UC3
-usecase "Approve Presentations" as UC4
-usecase "Create Time Schedule" as UC5
-usecase "Submit Presentation" as UC6
-usecase "View Conference Schedule" as UC7
-usecase "Book Tickets" as UC8
-usecase "Pay for Reservation" as UC9
-usecase "View Conferences" as UC10
-usecase "Make Reservation" as UC11
-usecase "Ask Questions" as UC12
-usecase "Vote for Presentation" as UC13
+usecase "Grant Rights" as UC1.1
+usecase "Remove Users" as UC1.2
 
+
+' REGISTERED
+'Manager
+usecase "Create Conference" as UC2
+usecase "Create Conference Time Schedule" as UC3
+usecase "Manage Conference Rooms" as UC4
+usecase "Approve Reservation - Give Tickets" as UC4
+
+'Manager->Presenter
+usecase "Approve Presentations" as UC5
+
+'Participant->Presenter
+usecase "Submit Presentation" as UC6
+
+'Presenter/Participant version
+usecase "View Presentations" as UC7
+usecase "Remove Presentation" as UC8
+
+'Participant
+usecase "Add Presentation" as UC9
+usecase "Ask Questions" as UC10
+usecase "Vote for Presentation" as UC11
+usecase "Make Reservation" as UC12
+usecase "Pay for Reservation" as UC13
+
+
+' GUEST
+usecase "View Conferences" as UC14
+usecase "View Conference Time Schedule" as UC15
+usecase "View Conference Capacity" as UC16
 }
 
-Administrator --> UC1
-Administrator --> UC2
-Administrator --> UC3
-Administrator --> UC4
-Administrator --> UC5
+ADMIN --> UC1
+ADMIN --> UC1.1
+ADMIN --> UC1.2
 
-RegisteredUser --> UC2
-RegisteredUser --> UC3
-RegisteredUser --> UC4
-RegisteredUser --> UC5
-RegisteredUser --> UC6
-RegisteredUser --> UC7
-RegisteredUser --> UC8
-RegisteredUser --> UC9
-RegisteredUser --> UC12
-RegisteredUser --> UC13
+REGISTERED --> UC2
+REGISTERED --> UC3
+REGISTERED --> UC4
+REGISTERED --> UC5
+REGISTERED --> UC6
+REGISTERED --> UC7
+REGISTERED --> UC8
+REGISTERED --> UC9
+REGISTERED --> UC10
+REGISTERED --> UC11
+REGISTERED --> UC12
+REGISTERED --> UC13
 
-UnregisteredUser --> UC10
-UnregisteredUser --> UC11
+GUEST --> UC14
+GUEST --> UC15
+GUEST --> UC16
 
+ADMIN --|> REGISTERED
+REGISTERED --|> GUEST
 @enduml
