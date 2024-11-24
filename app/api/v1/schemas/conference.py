@@ -17,12 +17,13 @@ class ConferenceBase(BaseModel):
     end_time: Optional[datetime] = None
     price: Optional[float] = None
     capacity: Optional[int] = None
+    organizer_id: Optional[int] = None
 
     model_config = {"arbitrary_types_allowed": True}
 
 
 class ConferenceCreate(ConferenceBase):
-    organizer_id: int
+    pass
 
 
 class ConferenceUpdate(BaseModel):
