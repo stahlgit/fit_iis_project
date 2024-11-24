@@ -94,19 +94,19 @@ entity questions {
     +lecture_id : int
 }
 
-conferences |o--o{ rooms
-conferences ||--o{ lectures
-conferences ||--o{ reservations
-conferences ||--o{ given_presentation
-users |o--o{ conferences
-users |o--o{ reservations
-users ||--o{ lectures
-users ||--o{ voting
-users ||--o{ questions
-users ||--o{ given_presentation
-rooms ||--o{ lectures
-reservations ||--o{ tickets
-lectures ||--o{ voting
-lectures ||--o{ questions
+conferences |o--o{ rooms : "has"
+conferences ||--o{ lectures : "attends"
+conferences ||--o{ reservations : "has"
+conferences ||--o{ given_presentation : "has"
+users |o--o{ conferences : "has"
+users |o--o{ reservations : "has"
+users ||--o{ lectures : "has"
+users ||--o{ voting : "has"
+users ||--o{ questions : "has"
+users ||--o{ given_presentation : "has"
+rooms ||--o{ lectures : "has"
+reservations ||--o{ tickets : "has"
+lectures ||--o{ voting : "has"
+lectures ||--o{ questions : "has"
 
 @enduml
