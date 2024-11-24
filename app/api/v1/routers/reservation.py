@@ -35,7 +35,10 @@ async def create_reservation(
             user = await User.get(reservation_in.user_id, session=db)
             if not user:
                 not_found("User")
-            reservation = await Reservation.create(db, **reservation_in.model_dump())
+            reservation_data = reservation_in.model_dump()
+            reservation_data.pop("email")
+
+            reservation = await Reservation.create(db, **reservation_data)
             return schemas.ReservationSchema.from_orm(reservation)
         else:
             guest = await create_guest(db, reservation_in.email)

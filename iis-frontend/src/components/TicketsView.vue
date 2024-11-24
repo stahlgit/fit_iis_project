@@ -3,13 +3,13 @@ import { ref, onMounted } from 'vue';
 
 const myTickets = ref([]);
 
-
+// todo show pending reservations and confirmed tickets
 </script>
 
 <template>
   <div v-if="myTickets.length === 0" class="mx-auto text-center">
     Ještě nemáte žádné lístky
-    <v-btn class="mx-2">Koupit</v-btn>
+    <v-btn class="mx-2" to="/public">Koupit</v-btn>
   </div>
   <div v-else>
     <v-btn class="mx-2 my-4">Koupit další</v-btn>

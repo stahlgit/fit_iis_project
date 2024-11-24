@@ -13,7 +13,27 @@ const axiosInstance = axios.create({
   },
 });
 
-export { axiosInstance }
+axiosInstance.interceptors.request.use(config => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers['Authorization']= `Bearer ${token}`;
+  }
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
+
+const authentiatedAxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+  },
+});
+
+
+export { axiosInstance, authentiatedAxiosInstance };
 
 const routes = [
   {
@@ -109,6 +129,7 @@ export async function register(username, email,password) {
     name: username,
     email: email,
     password: password,
+    role: "registered"
   };
 
   try {
@@ -184,7 +205,7 @@ export async function logout() {
 }
 
 export function isLoggedIn() {
-  return localStorage.getItem('authToken') !== null
+  return localStorage.getItem('authToken') != null
 }
 
 // Workaround for https://github.com/vitejs/vite/issues/11804

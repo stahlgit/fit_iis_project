@@ -32,7 +32,7 @@ async def create_conference(  # ADMIN ONLY
         await check_entities_exist(
             db,
             {
-                "room": [conference_in.organizer_id],
+                "user": [conference_in.organizer_id],
             },
         )
 
@@ -108,7 +108,6 @@ async def delete_conference(  # ADMIN ONLY
 async def get_free_tickets(
     conference_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ):
     try:
         conference = await Conference.get_one_by(db, id=conference_id)
