@@ -15,7 +15,6 @@ async function getUserReservations(conferences){
       const response = await axiosInstance.get('/reservation/all');
       const filteredReservations = response.data.filter(reservation => reservation.conference_id === conference.id);
       conferenceReservations.push({conference, reservations: filteredReservations});
-      console.log(conferenceReservations);
     }
     catch(error){
       console.error(error);
@@ -31,7 +30,6 @@ async function getMyReservations(){
     currentAccount.value = userResponse.data;
 
     const conferences = await getUserConferences(currentAccount.value.id);
-    console.log(conferences.value);
 
     myReservations.value = await getUserReservations(conferences);
 
@@ -41,8 +39,6 @@ async function getMyReservations(){
   }
   finally{
     loading.value = false;
-    console.log(currentAccount.value);
-
   }
 }
 

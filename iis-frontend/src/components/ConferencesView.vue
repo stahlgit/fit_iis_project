@@ -16,7 +16,6 @@ const conferences = ref([])
      })
      .finally(() => {
        loading.value = false
-       console.log(conferences.value)
      })
  }
 

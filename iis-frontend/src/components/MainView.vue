@@ -1,12 +1,17 @@
 <script setup>
 
-import { ref } from 'vue';
+import {ref, watchEffect} from 'vue';
 
 const navigationDrawer = ref(false);
 
 import router, { logout} from "@/router";
 const userRole = ref(localStorage.getItem('role'));
 
+const routeName = ref('');
+
+watchEffect(() => {
+  routeName.value = router.currentRoute.value.name;
+});
 </script>
 
 <template>
@@ -47,7 +52,7 @@ const userRole = ref(localStorage.getItem('role'));
       <v-icon>mdi-menu</v-icon>
     </v-app-bar-nav-icon>
     <v-app-bar-title>
-      Konference v0.1
+      {{routeName}}
     </v-app-bar-title>
 
     <v-spacer/>

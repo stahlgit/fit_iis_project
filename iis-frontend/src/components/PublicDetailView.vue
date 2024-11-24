@@ -60,7 +60,6 @@ async function doReservation() {
         "conference_id": props.id,
         "email": me.value.email
       });
-      console.log(response.data);
       newReservation.value = response.data;
       showGuestReservationConfirmation.value = true;
     } catch (error) {
@@ -79,7 +78,6 @@ async function doReservation() {
         "conference_id": props.id,
         "user_id": me.value.id
       });
-      console.log(response.data);
       newReservation.value = response.data;
       showUserReservationConfirmation.value = true;
     } catch (error) {

@@ -30,8 +30,6 @@ async function getReservations() {
       console.error(error);
     }
   }
-
-  console.log(enrichedReservations.value);
 }
 
 async function cancelReservation(id) {
@@ -76,6 +74,7 @@ onMounted(() => {
                   Čeká na potvrzení
                 </div>
                 <v-btn class="ml-4" variant="text" @click="cancelReservation(reservation.id)">Zrušit</v-btn>
+                <v-btn variant="text" @click="cancelReservation(reservation.id)">Zaplatit</v-btn>
               </v-chip>
             </div>
           </div>
