@@ -20,10 +20,10 @@ router = APIRouter(
     "/", response_model=schemas.ConferenceSchema, status_code=status.HTTP_201_CREATED
 )
 @log_endpoint
-async def create_conference(  # ADMIN ONLY
+async def create_conference(
     conference_in: schemas.ConferenceCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.ADMIN)),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.ConferenceSchema:
     try:
         if await Conference.get_by(db, name=conference_in.name):
@@ -67,13 +67,13 @@ async def read_conference(
         raise HTTPException(400, f"Error occurred: {e}")
 
 
-@router.put("/{conference_id}", response_model=schemas.ConferenceUpdate)  # ADMIN ONLY
+@router.put("/{conference_id}", response_model=schemas.ConferenceUpdate)
 @log_endpoint
 async def update_conference(
     conference_id: int,
     conference_in: schemas.ConferenceUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.ADMIN)),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.ConferenceUpdate:
     try:
         conference = await Conference.get(conference_id, session=db)
@@ -88,10 +88,10 @@ async def update_conference(
 
 @router.delete("/{conference_id}", response_model=schemas.ConferenceSchema)
 @log_endpoint
-async def delete_conference(  # ADMIN ONLY
+async def delete_conference(
     conference_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.ADMIN)),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.ConferenceSchema:
     try:
         conference = await Conference.get(conference_id, session=db)

@@ -22,7 +22,7 @@ router = APIRouter(
 async def create_room(  # ADMIN ONLY
     room_in: schemas.RoomCreateSchema,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.ADMIN)),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.RoomSchema:
     try:
         await check_entities_exist(
@@ -73,7 +73,7 @@ async def update_room(
     room_id: int,
     room_in: schemas.RoomUpdateSchema,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.ADMIN)),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.RoomUpdateSchema:
     try:
         room = await Room.get(room_id, session=db)
@@ -89,7 +89,7 @@ async def update_room(
 async def delete_room(
     room_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(role_required(UserRole.ADMIN)),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ) -> schemas.RoomSchema:
     try:
         room = await Room.get(room_id, session=db)
