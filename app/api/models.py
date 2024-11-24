@@ -134,8 +134,8 @@ class Reservation(BaseModelMixin, Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     number_of_tickets: Mapped[int] = mapped_column(Integer, nullable=False)
-    status: Mapped[str] = mapped_column(String, nullable=True)
     paid: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    approved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True  # HERE WAS FALSE

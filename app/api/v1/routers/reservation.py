@@ -95,8 +95,6 @@ async def get_user_reservations(
 ) -> List[schemas.ReservationSchema]:
     try:
         reservations = await Reservation.get_by(db, user_id=user_id)
-        if not reservations:
-            not_found("Reservation")
         return [
             schemas.ReservationSchema(**reservation.__dict__)
             for reservation in reservations

@@ -70,6 +70,20 @@ async def read_lecture(
         raise HTTPException(400, f"Error occured: {e}")
 
 
+@router.get("/conference/{conference_id}", response_model=List[schemas.LectureSchema])
+@log_endpoint
+async def read_lectures_by_conference(
+    conference_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
+) -> List[schemas.LectureSchema]:
+    try:
+        lectures = await Lecture.get_by(db, conference_id=conference_id)
+        return [schemas.LectureSchema(**lecture.__dict__) for lecture in lectures]
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")
+
+
 @router.put("/{lecture_id}", response_model=schemas.LectureUpdateSchema)
 @log_endpoint
 async def update_lecture(
