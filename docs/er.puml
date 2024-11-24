@@ -38,7 +38,7 @@ entity "Uživatel" {
   ---
   +jméno: String
   +email: String
-  +hash: String
+  +hash: ?String
   +role: String
 }
 
