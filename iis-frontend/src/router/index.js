@@ -23,6 +23,16 @@ axiosInstance.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
+// interceptor to refresh token on 401 error
+axiosInstance.interceptors.response.use(response => {
+  return response;
+}, async error => {
+  if (error.response.status === 401) {
+    localStorage.removeItem('authToken');
+    await router.push('/login');
+  }
+});
+
 const authentiatedAxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -34,6 +44,15 @@ const authentiatedAxiosInstance = axios.create({
 
 
 export { axiosInstance, authentiatedAxiosInstance };
+
+async function refreshUserSession() {
+  try {
+    axiosInstance.get('user/me')
+  } catch (error) {
+    localStorage.removeItem('authToken')
+    await router.push('/login')
+  }
+}
 
 const routes = [
   {
@@ -55,6 +74,7 @@ const routes = [
     path: '/main',
     name: 'Main',
     component: () => import('../components/MainView.vue'),
+    redirect: '/main/tickets',
     children: [
       {
         path: 'conferences',
