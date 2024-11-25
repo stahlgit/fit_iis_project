@@ -217,6 +217,7 @@ export async function login(username, password) {
     localStorage.setItem('userId', userData.id);
     localStorage.setItem('userData', JSON.stringify(userData));
     await router.push('/main');
+    location.reload();
     return true;
   } catch (error) {
     console.error('Login failed:', error.response ? error.response.data : error.message);
@@ -230,6 +231,7 @@ export async function logout() {
   localStorage.removeItem('userId')
   localStorage.removeItem('userData')
   await router.push('/')
+  location.reload()
 }
 
 export function isLoggedIn() {
