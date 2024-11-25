@@ -226,7 +226,7 @@ onMounted(initialize);
 <template>
   <v-dialog v-model="createDialog" max-width="600px">
     <v-card>
-      <v-card-title>Create Conference</v-card-title>
+      <v-card-title>Vytvořit konferenci</v-card-title>
       <v-card-text>
         <v-text-field label="Conference Name" v-model="newConference.name"></v-text-field>
         <v-text-field label="Description" v-model="newConference.description"></v-text-field>
@@ -251,24 +251,24 @@ onMounted(initialize);
           maxlength="16"
         />
         <v-banner variant="outlined" icon="mdi-alert" color="error" v-if="showerror">
-          Invalid input. Please check:
+          Neplatný vstup. Zkontrolujte prosím:
           <ul>
-              <li v-if="!isValidMonth">Month must be between January (01) and December (12).</li>
-              <li v-if="!isValidDay">Day must be valid for the selected month.</li>
-              <li v-if="!isValidHour">Hours must be between <strong>00</strong> and <strong>23</strong>.</li>
-              <li v-if="!isValidMinute">Minutes must be between <strong>00</strong> and <strong>59</strong>.</li>
+              <li v-if="!isValidMonth">Měsíc musí být mezi lednem (01) a prosincem (12).</li>
+              <li v-if="!isValidDay">Den musí být platný pro vybraný měsíc.</li>
+              <li v-if="!isValidHour">Hodiny musí být mezitím<strong>00</strong> and <strong>23</strong>.</li>
+              <li v-if="!isValidMinute"> Mezi tím musí být minuty<strong>00</strong> and <strong>59</strong>.</li>
           </ul>
       </v-banner>
 
         <v-text-field label="Price" v-model="newConference.price"></v-text-field>
         <v-text-field label="Capacity" v-model="newConference.capacity"></v-text-field>
         <v-banner variant="outlined" icon="mdi-alert" color="error" v-if="showerror">
-          Missing required fields. Please check your inputs.
+          Chybí povinná pole. Zkontrolujte prosím své vstupy.
         </v-banner>
       </v-card-text>
       <v-card-actions>
-        <v-btn text @click="closeDialogs">Cancel</v-btn>
-        <v-btn text @click="createConference">Create</v-btn>
+        <v-btn text @click="closeDialogs">Zavřít</v-btn>
+        <v-btn text @click="createConference">Vytvořit</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -297,7 +297,7 @@ onMounted(initialize);
 
   <v-container>
     <div class="my-2">
-      <v-btn prepend-icon="mdi-plus" @click="openCreateDialog">Add Conference</v-btn>
+      <v-btn prepend-icon="mdi-plus" @click="openCreateDialog">Přidať konferenci</v-btn>
     </div>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-list>

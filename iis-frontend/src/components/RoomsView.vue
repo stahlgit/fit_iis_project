@@ -132,7 +132,7 @@ onMounted(() => {
 <template>
 <v-dialog v-model="createDialog" max-width="600px">
   <v-card>
-    <v-card-title>Create Room</v-card-title>
+    <v-card-title>Vytvoření místnosti</v-card-title>
     <v-card-text>
       <v-text-field label="Room Name" v-model="newRoom.name"></v-text-field>
       <v-text-field label="Capacity" v-model="newRoom.capacity"></v-text-field>
@@ -170,8 +170,8 @@ onMounted(() => {
         ></v-select>
       </v-card-text>
       <v-card-actions>
-        <v-btn text @click="closeDialogs">Cancel</v-btn>
-        <v-btn text @click="updateRoom">Update</v-btn>
+        <v-btn text @click="closeDialogs">Zavřít</v-btn>
+        <v-btn text @click="updateRoom">Upravit</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
