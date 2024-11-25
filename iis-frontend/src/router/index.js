@@ -78,37 +78,37 @@ const routes = [
     children: [
       {
         path: 'conferences',
-        name: 'Conferences',
+        name: 'Konference',
         component: () => import('../components/ConferencesView.vue')
       },
       {
         path: 'rooms',
-        name: 'Rooms',
+        name: 'Místnosti',
         component: () => import('../components/RoomsView.vue')
       },
       {
         path: 'users',
-        name: 'Users',
+        name: 'Uživatelé',
         component: () => import('../components/UsersView.vue')
       },
       {
         path: 'reservations',
-        name: 'Reservations',
+        name: 'Rezervace',
         component: () => import('../components/ReservationsView.vue')
       },
       {
         path: 'tickets',
-        name: 'Tickets',
+        name: 'Vstupenky',
         component: () => import('../components/TicketsView.vue')
       },
       {
         path: 'voting',
-        name: 'Voting',
+        name: 'Hlasování',
         component: () => import('../components/VotingView.vue')
       },
       {
         path: 'presentations',
-        name: 'Presentations',
+        name: 'Prezentace',
         component: () => import('../components/PresentationsView.vue')
       }
     ]
@@ -134,7 +134,6 @@ const router = createRouter({
 // Navigation guard to check for authentication
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('authToken')
-  console.log('Token:', token)
   if (to.name !== 'Login' && to.name !== 'Register' && to.name !== 'Public' && to.name !== 'PublicDetail' && !token) {
     next({ name: 'Login' })
   } else {
@@ -211,6 +210,7 @@ export async function login(username, password) {
 
     localStorage.setItem('authToken', response.data.access_token);
     setUserRole(response.data.role);
+    localStorage.setItem('userId', response.data.id);
     await router.push('/main');
     return true;
   } catch (error) {
@@ -221,6 +221,8 @@ export async function login(username, password) {
 
 export async function logout() {
   localStorage.removeItem('authToken')
+  localStorage.removeItem('role')
+  localStorage.removeItem('userId')
   await router.push('/')
 }
 

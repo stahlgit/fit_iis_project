@@ -13,6 +13,7 @@ const conference = ref({})
 const me = ref({})
 const showGuestReservationConfirmation = ref(false);
 const showUserReservationConfirmation = ref(false);
+const loggedIn = ref(false);
 
 const newReservation = ref({
   "number_of_tickets": 0,
@@ -29,9 +30,9 @@ async function getMyDetails() {
   try {
     const response = await authentiatedAxiosInstance.get(`/user/me`);
     me.value = response.data;
-
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    loggedIn.value = false;
+    localStorage.removeItem('authToken');
   }
 }
 
@@ -54,13 +55,12 @@ async function doReservation() {
     // create user
     // create reservation
     try {
-      const response = await authentiatedAxiosInstance.post(`/reservation`, {
+      const response = await authentiatedAxiosInstance.post(`/reservation/`, {
         "number_of_tickets": newReservation.value.number_of_tickets,
         "paid": false,
         "conference_id": props.id,
-        "email": me.value.email
+        "email": mail.value,
       });
-      console.log(response.data);
       newReservation.value = response.data;
       showGuestReservationConfirmation.value = true;
     } catch (error) {
@@ -73,13 +73,12 @@ async function doReservation() {
     console.log('logged in')
     // create reservation
     try {
-      const response = await authentiatedAxiosInstance.post(`/reservation`, {
+      const response = await authentiatedAxiosInstance.post(`/reservation/`, {
         "number_of_tickets": newReservation.value.number_of_tickets,
         "paid": false,
         "conference_id": props.id,
         "user_id": me.value.id
       });
-      console.log(response.data);
       newReservation.value = response.data;
       showUserReservationConfirmation.value = true;
     } catch (error) {
@@ -111,13 +110,16 @@ onMounted(() => {
             </v-btn>
           </v-btn-group>
         </div>
-        <div v-if="!isLoggedIn">
+        <div v-if="!isLoggedIn()">
           <v-text-field label="Jméno" v-model="username"/>
           <v-text-field label="E-mail" v-model="mail"/>
         </div>
         <div>
-          <v-banner>
+          <v-banner v-if="isLoggedIn()" >
             Jste přihlášen jako <v-kbd>{{me.name}}</v-kbd> s emailem <v-kbd>{{me.email}}</v-kbd>.
+          </v-banner>
+          <v-banner v-else >
+            Rezerovat vstupenky můžete i bez registrace.<br> Po rezervaci vám bude zaslána potvrzovací zpráva.
           </v-banner>
           <v-banner icon="mdi-check" color="success" v-show="showGuestReservationConfirmation">
             Děkujeme za rezervaci vstupenek na konferenci.<br> Na email {{me.email}} vám byla zaslána potvrzovací zpráva.
