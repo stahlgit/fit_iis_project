@@ -36,14 +36,12 @@
 </div>
 
 <h3>Video</h3>
-<p>Viz old.html a zadani, hlavne se zamerit na UC. <a href="youtube.com">youtube.com</a></p>
-<strong>TODO</strong>
+<p><a href="https://rblazek.cz/img/iis.mp4">https://rblazek.cz/img/iis.mp4</a></p>
 
 <h2>Implementace</h2>
 <p>Projekt byl při rozdělování práce dekomponován na BE který je implementován ve složce <a href="../app/">app/</a> a na FE, ten je implementován odděleně ve složce <a href="../iis-frontend/">iis-frontend</a>. Tyto části se po specifikaci API na pravidelných týdeních schůzkách vyvýjely samostatně.</p>
 <p>Pro implementaci BE byla použita databáze Postgresql a Python framework Fast-Api. Tyto moduly byly už při vývoji zabaleny do docker kontejnerů takže bylo jednoduše dosaženo stejného vývojového prostředí bez nutnosti instalace databáze. Model databáze je implementován v <a href="../app/api/models.py">app/api/models.py</a> a byl migrován nástrojem Alembic. Komnikaci mezi Python aplikací a databázovým systémem zařizovalo ORM SQLAlchemy <a href="../app/api/base.py">app/api/base.py</a>. Používané endpointy a schémata jsou implementovány v <a href="../app/api/v1/">app/api/v1/</a> a crud operace v <a href="../app/api/crud/">app/api/crud/</a>. Kód obstarávající jiné služby je pak k nalezení v <a href="../app/services/">app/services/</a>.</p>
 <p>Samostatně implementovaný byl FE v Javascriptu s použitím frameworku Vue.js. Tento framework má velmi jednoduchou strukturu projektu, soubory <a href="../iis-frontend/index.html">iis-frontend/index.html</a>, <a href="../iis-frontend/src/App.vue">iis-frontend/src/App.vue</a>, <a href="../iis-frontend/src/main.js">iis-frontend/src/main.js</a> obsahují kostru. Komponenty které ji rozšiřují jsou implementované v <a href="../iis-frontend/src/components/">iis-frontend/src/components/</a>.</p>
-<strong>TODO</strong>
 
 <h3>Databáze</h3>
 <div class="images">
