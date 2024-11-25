@@ -144,7 +144,7 @@ onMounted(() => {
         label="Select Conference"
       ></v-select>
       <v-banner variant="outlined" icon="mdi-close" color="error" v-if="showerror">
-        Hovno
+        Nepodařilo se vytvořit místnost.
       </v-banner>
     </v-card-text>
     <v-card-actions>

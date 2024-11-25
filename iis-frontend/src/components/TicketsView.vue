@@ -12,9 +12,10 @@ async function getReservations() {
     let me = {}
     const response = await axiosInstance.get('/user/me');
     me = response.data;
-    console.log(me.id);
+    console.log(me);
     const response2 = await axiosInstance.get('/reservation/user/' + me.id);
     myReservations.value = response2.data;
+    console.log(myReservations.value);
   } catch (error) {
     console.error(error);
   }
@@ -30,16 +31,33 @@ async function getReservations() {
       console.error(error);
     }
   }
+  console.log(enrichedReservations.value);
+  console.log(myReservations.value);
 }
 
 async function cancelReservation(id) {
   try {
     await axiosInstance.delete('/reservation/' + id);
     enrichedReservations.value = [];
-    getReservations();
+    await getReservations();
   } catch (error) {
     console.error(error);
   }
+}
+
+async function payReservation(reservationId){
+  try {
+    const response = await axiosInstance.get(`/reservation/${reservationId}`);
+    const reservation = response.data;
+    reservation.paid = true;
+    await axiosInstance.put(`/reservation/${reservationId}`, reservation);
+  }
+  catch(error){
+    console.error('Error paying reservation:', error);
+  }
+
+  enrichedReservations.value = [];
+  await getReservations();
 }
 
 onMounted(() => {
@@ -48,7 +66,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="myReservations.length === 0" class="mx-auto text-center">
+  <div v-if="enrichedReservations.length === 0" class="mx-auto text-center">
     Ještě nemáte žádné lístky
     <v-btn class="mx-2" to="/public">Koupit</v-btn>
   </div>
@@ -65,16 +83,20 @@ onMounted(() => {
             <v-spacer/>
             <div>
               <v-chip>
-                <div v-if="reservation.paid === true">
+                <div v-if="reservation.approved === true">
+                  <v-icon>mdi-ticket</v-icon>
+                  Vstupenky vydány
+                </div>
+                <div v-else-if="reservation.paid === true">
                   <v-icon>mdi-check</v-icon>
-                  Potvrzeno
+                  Zaplaceno
                 </div>
                 <div v-else>
                   <v-icon>mdi-timer-sand</v-icon>
-                  Čeká na potvrzení
+                  Čeká na zaplacení
                 </div>
-                <v-btn class="ml-4" variant="text" @click="cancelReservation(reservation.id)">Zrušit</v-btn>
-                <v-btn variant="text" @click="cancelReservation(reservation.id)">Zaplatit</v-btn>
+                <v-btn :disabled="reservation.paid" class="ml-4" variant="text" @click="cancelReservation(reservation.id)">Zrušit</v-btn>
+                <v-btn :disabled="reservation.paid" variant="text" @click="payReservation(reservation.id)">Zaplatit</v-btn>
               </v-chip>
             </div>
           </div>
