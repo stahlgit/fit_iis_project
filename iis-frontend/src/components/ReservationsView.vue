@@ -127,7 +127,7 @@ onMounted(()=>{
   <h2>Moje rezervace</h2>
   <v-progress-linear indeterminate v-if="loadingMyReservations"/>
   <div v-else-if="myReservations.length === 0" class="mx-auto text-center">
-    Ještě neporádáte žádné konference
+    Ještě nemáte žádné rezervace
   </div>
   <v-list v-else>
     <template v-for="item in myReservations" :key="item.conference.id">
@@ -135,13 +135,16 @@ onMounted(()=>{
         <v-list-item-title class="font-weight-bold">{{ item.conference.name }}</v-list-item-title> <!-- Display Conference Name -->
       </v-list-item>
       <v-list class="ml-4"> <!-- Indent the list of rooms -->
+        <v-list-item v-if="item.reservations.length === 0">
+          <v-list-item-title>Zatím žádné rezervace</v-list-item-title>
+        </v-list-item>
         <v-list-item v-for="reservation in item.reservations" :key="reservation.id">
           <v-card class="mx-2"> <!-- Add some margin to the card -->
             <v-list-item-title>Počet vstupenek: {{ reservation.number_of_tickets }}</v-list-item-title> <!-- Display Room Name -->
             <v-list-item-subtitle style="color: lightgreen" v-if="reservation.paid">Zaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
             <v-list-item-subtitle style="color: lightcoral" v-else>Nezaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
-            <v-list-item-subtitle style="color: lightgreen" v-if="reservation.approved">Schváleno</v-list-item-subtitle> <!-- Display Room Description -->
-            <v-list-item-subtitle style="color: lightcoral" v-else>Neschváleno</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-list-item-subtitle style="color: lightgreen" v-if="reservation.approved">Vstupenky vydány</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-list-item-subtitle style="color: lightsalmon" v-else>Vstupenky k dispozici</v-list-item-subtitle> <!-- Display Room Description -->
             <v-card-actions>
               <v-btn @click="payReservation(reservation.id)" :disabled="reservation.paid" variant="outlined" color="success">{{!reservation.paid ? "Zaplatit" : "Zaplaceno"}}</v-btn>
               <v-btn @click="deleteReservation(reservation.id)" :disabled="reservation.paid" variant="outlined" color="error">{{!reservation.paid ? "Zrušit" : "Nelze zrušit"}}</v-btn>
@@ -163,6 +166,9 @@ onMounted(()=>{
         <v-list-item-title class="font-weight-bold">{{ item.conference.name }}</v-list-item-title> <!-- Display Conference Name -->
       </v-list-item>
       <v-list class="ml-4"> <!-- Indent the list of rooms -->
+        <v-list-item v-if="item.reservations.length === 0">
+          Zatím žádné rezervace
+        </v-list-item>
         <v-list-item v-for="reservation in item.reservations" :key="reservation.id">
           <v-card class="mx-2"> <!-- Add some margin to the card -->
             <v-list-item-title>{{reservation.user.name}} </v-list-item-title> <!-- Display Room Name -->
@@ -171,7 +177,7 @@ onMounted(()=>{
             <v-list-item-subtitle style="color: lightcoral" v-else>Nezaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
             <v-card-actions>
               <v-btn @click="payReservation(reservation.id)" :disabled="reservation.paid" variant="outlined" color="success">{{!reservation.paid ? "Označit jako zaplacené" : "Zaplaceno"}}</v-btn>
-              <v-btn @click="approveReservation(reservation.id)" :disabled="reservation.approved" variant="outlined" color="warning">{{!reservation.approved ? "Schválit" : "Schváleno"}}</v-btn>
+              <v-btn @click="approveReservation(reservation.id)" :disabled="reservation.approved" variant="outlined" color="warning">{{!reservation.approved ? "Vydat vstupenky" : "Vstupenky vydány"}}</v-btn>
               <v-btn @click="deleteReservation(reservation.id)" variant="outlined" color="error">Smazat</v-btn>
             </v-card-actions>
           </v-card>
