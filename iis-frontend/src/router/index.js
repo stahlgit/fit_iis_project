@@ -210,6 +210,7 @@ export async function login(username, password) {
 
     localStorage.setItem('authToken', response.data.access_token);
     setUserRole(response.data.role);
+    localStorage.setItem('userId', response.data.id);
     await router.push('/main');
     return true;
   } catch (error) {
@@ -220,6 +221,8 @@ export async function login(username, password) {
 
 export async function logout() {
   localStorage.removeItem('authToken')
+  localStorage.removeItem('role')
+  localStorage.removeItem('userId')
   await router.push('/')
 }
 
