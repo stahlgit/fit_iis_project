@@ -89,7 +89,7 @@ async function createRoom() {
     const response = await axiosInstance.post('/room/', {
       name: newRoom.value.name,
       capacity: newRoom.value.capacity,
-      conference_id: newRoom.value.conference_id.id,
+      conference_id: newRoom.value.conference_id,
     });
 
     console.log('Room created:', response.data);

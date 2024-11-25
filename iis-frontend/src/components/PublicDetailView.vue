@@ -27,12 +27,15 @@ const username = ref("");
 const mail = ref("");
 
 async function getMyDetails() {
-  try {
-    const response = await authentiatedAxiosInstance.get(`/user/me`);
-    me.value = response.data;
-  } catch (error) {
-    loggedIn.value = false;
-    localStorage.removeItem('authToken');
+  if (isLoggedIn()){
+    try {
+      const response = await authentiatedAxiosInstance.get(`/user/me`);
+      me.value = response.data;
+    } catch (error) {
+      loggedIn.value = false;
+      localStorage.removeItem('authToken');
+      location.reload()
+    }
   }
 }
 
@@ -60,6 +63,7 @@ async function doReservation() {
         "paid": false,
         "conference_id": props.id,
         "email": mail.value,
+        "approved": false,
       });
       newReservation.value = response.data;
       showGuestReservationConfirmation.value = true;
@@ -77,15 +81,16 @@ async function doReservation() {
         "number_of_tickets": newReservation.value.number_of_tickets,
         "paid": false,
         "conference_id": props.id,
-        "user_id": me.value.id
+        "user_id": me.value.id,
+        "approved": false,
       });
       newReservation.value = response.data;
       showUserReservationConfirmation.value = true;
     } catch (error) {
       console.error('Error creating reservation:', error);
     }
-
   }
+  //location.reload()
 }
 
 onMounted(() => {
@@ -160,7 +165,7 @@ onMounted(() => {
     </div>
     <h3>{{conference.description}}</h3>
 
-    <v-btn class="my-10" @click="dialog = true">Rezervovat</v-btn>
+    <v-btn :disabled="conference.freeCapacity < 1" class="my-10" @click="dialog = true">{{conference.freeCapacity > 0 ? "Rezervovat" : "Kapacita byla naplněna"}}</v-btn>
 
   </v-container>
 </template>
