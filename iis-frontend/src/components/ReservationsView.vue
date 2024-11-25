@@ -44,9 +44,14 @@ async function getMyReservations(){
     const userResponse = await axiosInstance.get('/user/me');
     currentAccount.value = userResponse.data;
 
-    const conferences = await getUserConferences(currentAccount.value.id);
+    const allReservations = await axiosInstance.get('/reservation/all');
 
-    myReservations.value = await getUserReservations(conferences);
+    myReservations.value = allReservations.map(item => ({
+      conference: item.conference,
+      reservations: item.reservations.filter(
+        reservation => reservation.user_id === currentAccount.value.id
+      )
+    })).filter(item => item.reservations.length > 0);
 
   }
   catch(error){
@@ -157,7 +162,7 @@ onMounted(()=>{
 
   <h2 class="mt-5">Rezervace ke schválení</h2>
   <v-progress-linear v-if="loadingReservationsToApprove" indeterminate/>
-  <div v-else-if="myReservations.length === 0" class="mx-auto text-center">
+  <div v-else-if="reservationsToApprove.length === 0" class="mx-auto text-center">
     Ještě neporádáte žádné konference
   </div>
   <v-list v-else>
