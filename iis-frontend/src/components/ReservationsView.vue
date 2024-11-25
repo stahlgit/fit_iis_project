@@ -44,15 +44,21 @@ async function getMyReservations(){
     const userResponse = await axiosInstance.get('/user/me');
     currentAccount.value = userResponse.data;
 
-    const allReservations = await axiosInstance.get('/reservation/all');
+    const allresponse = await axiosInstance.get('/reservation/all');
+    const allReservations = allresponse.data;
 
-    myReservations.value = allReservations.map(item => ({
-      conference: item.conference,
-      reservations: item.reservations.filter(
-        reservation => reservation.user_id === currentAccount.value.id
-      )
-    })).filter(item => item.reservations.length > 0);
+    const userReservations = allReservations.filter(reservation => reservation.user_id === currentAccount.value.id);
 
+    const conferencesResponse = await axiosInstance.get('/conferences/all');
+    const conferences = conferencesResponse.data;
+
+    myReservations.value = conferences.map(conference => {
+      const conferenceReservations = userReservations.filter(reservation => reservation.conference_id === conference.id);
+      return {
+        conference,
+        reservations: conferenceReservations,
+      };
+    }).filter(item => item.reservations.length > 0);
   }
   catch(error){
     console.error("Error fetching user data:", error);
@@ -133,6 +139,7 @@ onMounted(()=>{
   <v-progress-linear indeterminate v-if="loadingMyReservations"/>
   <div v-else-if="myReservations.length === 0" class="mx-auto text-center">
     Ještě nemáte žádné rezervace
+    console.log(myReservations.value);
   </div>
   <v-list v-else>
     <template v-for="item in myReservations" :key="item.conference.id">
