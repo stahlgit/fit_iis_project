@@ -7,7 +7,19 @@ const currentAccount = ref(null)
 
 const conferences = ref([]);
 const createDialog = ref(false);
+const updateDialog = ref(false);
 const newConference = ref({
+  name: "",
+  description: "",
+  genre: "",
+  place: "",
+  start_time: "",
+  end_time: "",
+  price: "",
+  capacity: "",
+});
+const selectedConference =
+ref({
   name: "",
   description: "",
   genre: "",
@@ -91,6 +103,7 @@ function formatDateTime(type) {
     formattedEndTime.value = formatted;
     newConference.value.end_time = formatted;
   }
+
   showerror.value = !isValid;
 }
 
@@ -138,12 +151,52 @@ async function createConference() {
   }
 }
 
+async function updateConference() {
+  if (!selectedConference.value) {
+    console.error("No conference selected for update.");
+    return;
+  }
+  try{
+    const response = await axiosInstance.put(`/conferences/${selectedConference.value.id}`, {
+      id: selectedConference.value.id,
+      name: selectedConference.value.name,
+      description: selectedConference.value.description,
+      genre: selectedConference.value.genre,
+      place: selectedConference.value.place,
+      start_time: selectedConference.value.start_time,
+      end_time: selectedConference.value.end_time,
+      price: selectedConference.value.price,
+      capacity: selectedConference.value.capacity,
+      organizer_id: selectedConference.value.organizer_id,
+    });
+    console.log("Conference updated:", response.data);
+    closeDialogs();
+    await fetchConferences();
+
+    } catch(error) {
+      console.error("Error updating conference:", error);
+    } finally {
+      loading.value = false;
+    }
+}
+
+function openUpdateDialog(conference) {
+    if (conference) {
+      console.log("Opening update dialog for conference:", conference); // Debug log
+      selectedConference.value = { ...conference }; // Deep copy to avoid directly modifying the original object
+      updateDialog.value = true;
+    } else {
+        console.error("Attempted to open update dialog without a conference.");
+    }
+}
+
 function openCreateDialog() {
   createDialog.value = true;
 }
 
 function closeDialogs() {
   createDialog.value = false;
+  updateDialog.value = false;
   showerror.value = false;
 }
 
@@ -158,6 +211,8 @@ async function getAccount(){
     loading.value = false;
   }
 }
+
+
 
 async function initialize() {
   await Promise.all([fetchConferences(), getAccount()]);
@@ -218,19 +273,55 @@ onMounted(initialize);
     </v-card>
   </v-dialog>
 
+  <v-dialog v-model="updateDialog" max-width="600px">
+    <v-card>
+      <v-card-title>Update Conference</v-card-title>
+      <v-card-text>
+        <v-text-field label="Conference Name" v-model="selectedConference.name"></v-text-field>
+        <v-text-field label="Description" v-model="selectedConference.description"></v-text-field>
+        <v-text-field label="Genre" v-model="selectedConference.genre"></v-text-field>
+        <v-text-field label="Place" v-model="selectedConference.place"></v-text-field>
+        <v-text-field label="Start Time" v-model="selectedConference.start_time"></v-text-field>
+        <v-text-field label="End Time" v-model="selectedConference.end_time"></v-text-field>
+        <v-text-field label="Price" v-model="selectedConference.price"></v-text-field>
+        <v-text-field label="Capacity" v-model="selectedConference.capacity"></v-text-field>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn text @click="closeDialogs">Cancel</v-btn>
+        <v-btn text @click="updateConference(selectedConference)">Update</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
+
   <v-container>
     <div class="my-2">
       <v-btn prepend-icon="mdi-plus" @click="openCreateDialog">Add Conference</v-btn>
     </div>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-list>
-      <v-list-item v-for="conference in conferences" :key="conference.id">
-        <v-card>
-          <v-list-item-title>{{ conference.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ conference.description }}</v-list-item-subtitle>
-        </v-card>
-      </v-list-item>
-    </v-list>
+    <v-list-item v-for="conference in conferences" :key="conference.id">
+      <v-card>
+        <div class="d-flex">
+          <div class="mr-2">
+            <v-list-item-title @click="openUpdateDialog(conference)">{{ conference.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ conference.description }}</v-list-item-subtitle>
+
+          </div>
+
+          <div>
+            <template v-if="currentAccount && (currentAccount.role === 'admin' || conference.organizer_id === currentAccount.id)">
+              <v-icon @click="openUpdateDialog(conference)">mdi-pencil</v-icon>
+            </template>
+
+          </div>
+        </div>
+
+      </v-card>
+    </v-list-item>
+  </v-list>
+
   </v-container>
 </template>
 
