@@ -122,7 +122,9 @@ async def update_reservation(
         reservation = await Reservation.get(reservation_id, session=db)
         if not reservation:
             not_found("Reservation")
-        return Reservation.update(db, id=reservation_id, **reservation_in.model_dump())
+        return await Reservation.update(
+            db, id=reservation_id, **reservation_in.model_dump()
+        )
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
 
