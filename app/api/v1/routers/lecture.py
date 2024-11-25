@@ -1,11 +1,12 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
+from app.api.crud import image as image_crud
 from app.api.crud.user import role_required
 from app.api.models import Lecture, User, UserRole
-from app.api.v1.schemas import lecture as schemas
+from app.api.v1 import schemas as schemas
 from app.services import check_entities_exist, get_db, log_endpoint, not_found
 
 router = APIRouter(
@@ -116,3 +117,48 @@ async def delete_lecture(
         return lecture
     except Exception as e:
         raise HTTPException(400, f"Error occurred: {e}")
+
+
+@router.post("/upload")
+@log_endpoint
+async def upload_lecture_image(
+    file: UploadFile,
+    lecture_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        await check_entities_exist(
+            db,
+            {
+                "lecture": [lecture_id],
+            },
+        )
+
+        lecture = await Lecture.get_one_by(db, id=lecture_id)
+        image_filename = image_crud.store_image(file)
+        image_path = f"media/images/{image_filename}"
+
+        await lecture.update(db, id=lecture_id, image=image_path)
+
+        return {"path": image_path}
+    except schemas.InvalidFileName as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message)
+
+
+@router.get("/download/{lecture_id}")
+async def read_upload_file(
+    lecture_id: int,
+    db: Session = Depends(get_db),
+):
+    try:
+        await check_entities_exist(
+            db,
+            {
+                "lecture": [lecture_id],
+            },
+        )
+        lecture = await Lecture.get_one_by(db, id=lecture_id)
+        filename = lecture.image.split("/")[-1]
+        return image_crud.read_image(filename)
+    except schemas.InvalidFileName as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
