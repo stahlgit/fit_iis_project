@@ -1,6 +1,7 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -161,3 +162,19 @@ async def set_admin(
             status_code=400, detail="Error occured while setting user role"
         )
     return user
+
+
+@router.delete("/{user_id}", status_code=204)
+@log_endpoint
+async def delete_user(
+    user_id: int,
+    current_user: User = Depends(crud.role_required(UserRole.ADMIN)),
+    db: Session = Depends(get_db),
+):
+    try:
+        user = await User.get_one_by(db, id=user_id)
+        if not user:
+            not_found("User")
+        return JSONResponse(status_code=204, content=None)
+    except Exception as e:
+        raise HTTPException(400, f"Error occured: {e}")

@@ -92,7 +92,6 @@ async function createRoom() {
       conference_id: newRoom.value.conference_id,
     });
 
-    console.log('Room created:', response.data);
     closeDialogs();
     await getUser();
   } catch (error) {
@@ -149,8 +148,8 @@ onMounted(() => {
       </v-banner>
     </v-card-text>
     <v-card-actions>
-      <v-btn text @click="closeDialogs">Cancel</v-btn>
-      <v-btn text @click="createRoom">Create</v-btn>
+      <v-btn text @click="closeDialogs">Zavřít</v-btn>
+      <v-btn text @click="createRoom">Vytvořit</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -158,7 +157,7 @@ onMounted(() => {
 
   <v-dialog v-model="updateDialog" max-width="600px">
     <v-card v-if="selectedRoom">
-      <v-card-title>Update Room</v-card-title>
+      <v-card-title>Upravení místnosti</v-card-title>
       <v-card-text>
         <v-text-field label="Room Name" v-model="selectedRoom.name"></v-text-field>
         <v-text-field label="Capacity" v-model="selectedRoom.capacity"></v-text-field>

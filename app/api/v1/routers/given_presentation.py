@@ -69,7 +69,7 @@ async def read_given_presentation(
         raise HTTPException(400, f"Error occured: {e}")
 
 
-@router.put("/{given_id}", response_model=schemas.GivenPresentationUpdateSchema)
+@router.patch("/{given_id}", response_model=schemas.GivenPresentationUpdateSchema)
 @log_endpoint
 async def update_given_presentation(
     given_id: int,

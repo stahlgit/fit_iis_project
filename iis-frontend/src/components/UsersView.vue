@@ -54,6 +54,22 @@ function saveUserChanges() {
         });
 }
 
+function deleteUser(user) {
+    if (!user) return;
+
+    const token = localStorage.getItem('authToken');
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    axiosInstance.delete(`user/${user.id}`)
+        .then(() => {
+            // Remove the user from the list
+            users.value = users.value.filter(u => u.id !== user.id);
+        })
+        .catch(error => {
+            console.error("Error deleting user:", error.response ? error.response.data : error.message);
+        });
+}
+
 
 </script>
 
@@ -90,17 +106,21 @@ function saveUserChanges() {
   </v-dialog>
 
   <v-container>
-    <div class="my-2">
-      <v-btn prepend-icon="mdi-plus">Přidat</v-btn>
-    </div>
+    <h2>Zoznam užívatelú</h2>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-list>
-      <v-list-item v-for="user in users" :key="user.id">
+      <v-list-item v-for="user in users" :key="user.id" class="mb-4">
+        <div class="d-flex mb-2 ml-2">
+          <v-icon @click="openEditDialog(user)" class="ml-2">mdi-pencil</v-icon>
+          <v-icon @click="deleteUser(user)"  class="ml-2">mdi-delete</v-icon>
+          <v-list-item-title class="ml-2">{{ user.name }}</v-list-item-title>
+
+        </div>
+        <v-list-item-subtitle class="pl-16 ml-4">{{ user.email }}</v-list-item-subtitle>
+
         <v-card>
-          <v-list-item-title>{{ user.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+
           <v-list-item-action>
-            <v-btn @click="openEditDialog(user)">Edit</v-btn> <!-- Call openEditDialog with the user -->
           </v-list-item-action>
         </v-card>
       </v-list-item>

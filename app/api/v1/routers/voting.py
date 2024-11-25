@@ -29,7 +29,7 @@ async def create_voting(
             db,
             {
                 "user": [voting_in.user_id],
-                "luecture": [voting_in.lecture_id],
+                "lecture": [voting_in.lecture_id],
             },
         )
         return await Voting.create(db, **voting_in.model_dump())

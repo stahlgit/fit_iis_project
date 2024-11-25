@@ -275,7 +275,7 @@ onMounted(initialize);
 
   <v-dialog v-model="updateDialog" max-width="600px">
     <v-card>
-      <v-card-title>Update Conference</v-card-title>
+      <v-card-title>Upravení konference</v-card-title>
       <v-card-text>
         <v-text-field label="Conference Name" v-model="selectedConference.name"></v-text-field>
         <v-text-field label="Description" v-model="selectedConference.description"></v-text-field>
@@ -287,8 +287,8 @@ onMounted(initialize);
         <v-text-field label="Capacity" v-model="selectedConference.capacity"></v-text-field>
       </v-card-text>
       <v-card-actions>
-        <v-btn text @click="closeDialogs">Cancel</v-btn>
-        <v-btn text @click="updateConference(selectedConference)">Update</v-btn>
+        <v-btn text @click="closeDialogs">Zavřít</v-btn>
+        <v-btn text @click="updateConference(selectedConference)">Upravit</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -305,17 +305,18 @@ onMounted(initialize);
       <v-card>
         <div class="d-flex">
           <div class="mr-2">
-            <v-list-item-title @click="openUpdateDialog(conference)">{{ conference.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ conference.description }}</v-list-item-subtitle>
-
-          </div>
-
-          <div>
             <template v-if="currentAccount && (currentAccount.role === 'admin' || conference.organizer_id === currentAccount.id)">
               <v-icon @click="openUpdateDialog(conference)">mdi-pencil</v-icon>
             </template>
 
           </div>
+          <div>
+            <v-list-item-title @click="openUpdateDialog(conference)">{{ conference.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ conference.description }}</v-list-item-subtitle>
+
+          </div>
+
+
         </div>
 
       </v-card>

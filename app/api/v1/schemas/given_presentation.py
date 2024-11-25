@@ -9,7 +9,7 @@ import app.api.v1.schemas as schemas
 
 class GivenPresentationBase(BaseModel):
     proposal: Optional[str] = None
-    status: str
+    status: Optional[str] = None
     user_id: int
     conference_id: int
 
