@@ -73,9 +73,53 @@ async function getReservationsToApprove() {
   }
 }
 
+async function payReservation(reservationId){
+  try {
+    const response = await axiosInstance.get(`/reservation/${reservationId}`);
+    const reservation = response.data;
+    reservation.paid = true;
+    await axiosInstance.put(`/reservation/${reservationId}`, reservation);
+  }
+  catch(error){
+    console.error('Error paying reservation:', error);
+  }
+
+  await loadData();
+}
+
+async function approveReservation(reservationId){
+  try {
+    const response = await axiosInstance.get(`/reservation/${reservationId}`);
+    const reservation = response.data;
+    reservation.approved = true;
+    await axiosInstance.put(`/reservation/${reservationId}`, reservation);
+  }
+  catch(error){
+    console.error('Error approving reservation:', error);
+  }
+
+  await loadData();
+}
+
+async function deleteReservation(reservationId){
+  alert('Opravdu si přejete smazat rezervaci?');
+  try {
+    await axiosInstance.delete(`/reservation/${reservationId}`);
+  }
+  catch(error){
+    console.error('Error deleting reservation:', error);
+  }
+
+  await loadData();
+}
+
+async function loadData(){
+  await getMyReservations();
+  await getReservationsToApprove();
+}
+
 onMounted(()=>{
-  getMyReservations();
-  getReservationsToApprove();
+  loadData();
 })
 </script>
 
@@ -94,8 +138,14 @@ onMounted(()=>{
         <v-list-item v-for="reservation in item.reservations" :key="reservation.id">
           <v-card class="mx-2"> <!-- Add some margin to the card -->
             <v-list-item-title>Počet vstupenek: {{ reservation.number_of_tickets }}</v-list-item-title> <!-- Display Room Name -->
-            <v-list-item-subtitle style="color: lightcoral" v-if="reservation.paid">Zaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-list-item-subtitle style="color: lightgreen" v-if="reservation.paid">Zaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
             <v-list-item-subtitle style="color: lightcoral" v-else>Nezaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-list-item-subtitle style="color: lightgreen" v-if="reservation.approved">Schváleno</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-list-item-subtitle style="color: lightcoral" v-else>Neschváleno</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-card-actions>
+              <v-btn @click="payReservation(reservation.id)" :disabled="reservation.paid" variant="outlined" color="success">{{!reservation.paid ? "Zaplatit" : "Zaplaceno"}}</v-btn>
+              <v-btn @click="deleteReservation(reservation.id)" :disabled="reservation.paid" variant="outlined" color="error">{{!reservation.paid ? "Zrušit" : "Nelze zrušit"}}</v-btn>
+            </v-card-actions>
           </v-card>
         </v-list-item>
       </v-list>
@@ -117,12 +167,12 @@ onMounted(()=>{
           <v-card class="mx-2"> <!-- Add some margin to the card -->
             <v-list-item-title>{{reservation.user.name}} </v-list-item-title> <!-- Display Room Name -->
             <v-list-item-subtitle>Počet vstupenek: {{ reservation.number_of_tickets }}</v-list-item-subtitle>
-            <v-list-item-subtitle style="color: lightcoral" v-if="reservation.paid">Zaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
+            <v-list-item-subtitle style="color: lightgreen" v-if="reservation.paid">Zaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
             <v-list-item-subtitle style="color: lightcoral" v-else>Nezaplaceno</v-list-item-subtitle> <!-- Display Room Description -->
             <v-card-actions>
-              <v-btn v-if="!reservation.paid" variant="outlined" color="success">Označit jako zaplacené</v-btn>
-              <v-btn v-if="!reservation.approved" variant="outlined" color="success">Schválit rezervaci</v-btn>
-              <v-btn v-else disabled variant="outlined" color="success">Schválit rezervaci</v-btn>
+              <v-btn @click="payReservation(reservation.id)" :disabled="reservation.paid" variant="outlined" color="success">{{!reservation.paid ? "Označit jako zaplacené" : "Zaplaceno"}}</v-btn>
+              <v-btn @click="approveReservation(reservation.id)" :disabled="reservation.approved" variant="outlined" color="warning">{{!reservation.approved ? "Schválit" : "Schváleno"}}</v-btn>
+              <v-btn @click="deleteReservation(reservation.id)" variant="outlined" color="error">Smazat</v-btn>
             </v-card-actions>
           </v-card>
         </v-list-item>
