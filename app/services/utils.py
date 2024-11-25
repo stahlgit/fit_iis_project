@@ -25,15 +25,16 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def check_entities_exist(db: Session, entity_checks: dict):
+async def check_entities_exist(db: Session, entity_checks: dict[str, list[int]]):
+    entities_dic = {
+        "room": models.Room.get_one_by,
+        "conference": models.Conference.get_one_by,
+        "lecture": models.Lecture.get_one_by,
+        "user": models.User.get_one_by,
+        "reservation": models.Reservation.get_one_by,
+    }
     for entity_type, ids in entity_checks.items():
         for id in ids:
-            exists = await {
-                "room": models.Room.get_one_by,
-                "conference": models.Conference.get_one_by,
-                "lecture": models.Lecture.get_one_by,
-                "user": models.User.get_one_by,
-                "reservation": models.Reservation.get_one_by,
-            }[entity_type](db, id=id)
+            exists = await entities_dic[entity_type](db, id=id)
             if not exists:
                 raise not_found(entity_type.capitalize())

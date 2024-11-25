@@ -1,7 +1,7 @@
 <script setup>
 
 import { ref } from 'vue';
-import { register } from '@/router';
+import router, { register } from '@/router';
 
 const username = ref('');
 const email = ref('');
@@ -19,6 +19,7 @@ async function doRegister() {
 
   if (res) {
     console.log('Logged in');
+    router.push('/login');
   } else {
     console.log('Failed to log in');
 

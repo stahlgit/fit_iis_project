@@ -10,3 +10,4 @@ iis-frontend/package-lock.json
 iis-frontend/yarn.lock
 iis-frontend/package.json
 dump.sql
+media/

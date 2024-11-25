@@ -1,4 +1,5 @@
 from .conference import *
+from .error import *
 from .given_presentation import *
 from .lecture import *
 from .question import *

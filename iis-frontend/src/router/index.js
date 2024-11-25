@@ -210,6 +210,12 @@ export async function login(username, password) {
 
     localStorage.setItem('authToken', response.data.access_token);
     setUserRole(response.data.role);
+
+    const response1 = await axiosInstance.get('user/me');
+    const userData = response1.data;
+
+    localStorage.setItem('userId', userData.id);
+    localStorage.setItem('userData', JSON.stringify(userData));
     await router.push('/main');
     return true;
   } catch (error) {
@@ -220,6 +226,9 @@ export async function login(username, password) {
 
 export async function logout() {
   localStorage.removeItem('authToken')
+  localStorage.removeItem('role')
+  localStorage.removeItem('userId')
+  localStorage.removeItem('userData')
   await router.push('/')
 }
 
