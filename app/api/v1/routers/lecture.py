@@ -125,6 +125,7 @@ async def upload_lecture_image(
     file: UploadFile,
     lecture_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ):
     try:
         await check_entities_exist(
@@ -149,6 +150,7 @@ async def upload_lecture_image(
 async def read_upload_file(
     lecture_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(role_required(UserRole.REGISTERED)),
 ):
     try:
         await check_entities_exist(
