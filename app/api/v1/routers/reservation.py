@@ -21,7 +21,7 @@ router = APIRouter(
 @log_endpoint
 async def create_reservation(
     reservation_in: schemas.ReservationCreateSchema,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> schemas.ReservationSchema:
     try:
         await check_entities_exist(
@@ -43,20 +43,28 @@ async def create_reservation(
         else:
             guest = await create_guest(db, reservation_in.email)
 
+            guest_data = {
+                "id": guest.id,
+                "name": guest.name,
+                "email": guest.email,
+            }
+
             reservation_data = reservation_in.model_dump()
             reservation_data.pop("email")
             reservation_data["user_id"] = guest.id
 
+            ## secondary session !!!
             reservation = await Reservation.create(db, **reservation_data)
             return schemas.ReservationGuestSchema(
+                id=reservation.id,
                 number_of_tickets=reservation.number_of_tickets,
-                status=reservation.status,
                 paid=reservation.paid,
-                user_id=guest.id,
+                approved=reservation.approved,
+                user_id=guest_data["id"],
                 conference_id=reservation.conference_id,
-                username=guest.name,
-                email=guest.email,
-                password=guest.name,  ##username == password
+                username=guest_data["name"],
+                email=guest_data["email"],
+                password=guest_data["name"],  ##username == password
             )
 
     except Exception as e:

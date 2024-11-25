@@ -25,6 +25,6 @@ volumes:
   pgdata:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: './pgdata'
+      type: none
+      o: bind
+      device: ${PWD}/pgdata
