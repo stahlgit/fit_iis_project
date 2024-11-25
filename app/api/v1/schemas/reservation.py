@@ -9,8 +9,8 @@ from app.api.v1 import schemas as schemas
 
 class ReservationBase(BaseModel):
     number_of_tickets: int
-    status: Optional[str] = None
     paid: bool
+    approved: bool
     user_id: Optional[int] = None
     conference_id: int
 

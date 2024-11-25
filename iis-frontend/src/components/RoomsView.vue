@@ -7,10 +7,10 @@ import {getUserConferences} from "@/services/utils";
 const currentAccount = ref(null)
 const loading = ref(false)
 const conferencesWithRooms = ref([])
-const createDialog = ref(false); // State for create dialog
-const updateDialog = ref(false); // State for update dialog
-const selectedRoom = ref({ name: '', capacity: null, conference_id: null }); // Initialize selected room object
-const newRoom = ref({ name: '', capacity: null}); // Initialize new room object
+const createDialog = ref(false);
+const updateDialog = ref(false);
+const selectedRoom = ref({ name: '', capacity: null, conference_id: null });
+const newRoom = ref({ name: '', capacity: null});
 const showerror = ref(false);
 const isAdmin = ref(false);
 
@@ -59,7 +59,7 @@ async function getUser() {
 
 
 function openCreateDialog() {
-  createDialog.value = true; // Open create dialog
+  createDialog.value = true;
 }
 
 function openUpdateDialog(room) {
@@ -74,7 +74,7 @@ function openUpdateDialog(room) {
 function closeDialogs() {
   createDialog.value = false;
   updateDialog.value = false;
-  selectedRoom.value = null; // Reset selected room
+  selectedRoom.value = null;
 }
 
 async function createRoom() {
