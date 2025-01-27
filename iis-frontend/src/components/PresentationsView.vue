@@ -43,7 +43,6 @@ async function getConferences() {
     conferences.forEach(conference => {
       conferenceMap.value[conference.id] = conference.name; // Map conference_id to name
     });
-    console.log(conferenceMap.value);
   } catch (error) {
     console.error('Error fetching conferences:', error);
   }
@@ -134,8 +133,7 @@ async function updatePresentation() {
   loading.value = true;
   showerror.value = false;
 
-  const rawPresentation = toRaw(selectedPresentation.value); // Extract raw data
-  console.log("Raw Presentation Data:", rawPresentation);
+  const rawPresentation = toRaw(selectedPresentation.value);
 
   const { id, conference_id, proposal, status } = rawPresentation;
 
@@ -169,7 +167,6 @@ async function deletePresentation(presentation) {
   loading.value = true;
 
   try {
-    console.log(presentation);
     const response = await axiosInstance.delete(`/given_presentation/${presentation.id}`)
     getPresentations();
   } catch (error) {

@@ -112,7 +112,6 @@ async function updateRoom() {
       conference_id: newRoom.value.conference_id,
     });
 
-    console.log('Room updated:', response.data);
     closeDialogs();
     await getUser();
   } catch (error) {

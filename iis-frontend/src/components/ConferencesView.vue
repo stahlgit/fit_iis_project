@@ -140,7 +140,7 @@ async function createConference() {
       price: newConference.value.price,
       capacity: newConference.value.capacity,
       organizer_id: currentAccount.value.id,
-    });    console.log("Conference created:", response.data);
+    });
     closeDialogs();
     await fetchConferences();
   } catch (error) {
@@ -169,7 +169,6 @@ async function updateConference() {
       capacity: selectedConference.value.capacity,
       organizer_id: selectedConference.value.organizer_id,
     });
-    console.log("Conference updated:", response.data);
     closeDialogs();
     await fetchConferences();
 
@@ -182,7 +181,6 @@ async function updateConference() {
 
 function openUpdateDialog(conference) {
     if (conference) {
-      console.log("Opening update dialog for conference:", conference); // Debug log
       selectedConference.value = { ...conference }; // Deep copy to avoid directly modifying the original object
       updateDialog.value = true;
     } else {

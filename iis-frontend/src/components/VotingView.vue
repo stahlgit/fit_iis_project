@@ -27,7 +27,6 @@ async function fetchConferences() {
   } catch (error) {
     console.error('Error fetching conferences:', error)
   }
-  console.log(attendedConferences.value)
 }
 
 function showRatingDialog(id) {
@@ -42,7 +41,6 @@ async function rateLecture() {
       "lecture_id": ratingId.value,
       "user_id": localStorage.getItem('userId')
     })
-    console.log(response.data)
     ratingDialog.value = false
     snackbar.value = true
   } catch (error) {

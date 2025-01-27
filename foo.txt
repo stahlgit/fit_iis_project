@@ -1,0 +1,220 @@
+[1mdiff --git a/iis-frontend/src/components/ConferencesView.vue b/iis-frontend/src/components/ConferencesView.vue[m
+[1mindex 61fb082..b48b123 100644[m
+[1m--- a/iis-frontend/src/components/ConferencesView.vue[m
+[1m+++ b/iis-frontend/src/components/ConferencesView.vue[m
+[36m@@ -140,7 +140,7 @@[m [masync function createConference() {[m
+       price: newConference.value.price,[m
+       capacity: newConference.value.capacity,[m
+       organizer_id: currentAccount.value.id,[m
+[31m-    });    console.log("Conference created:", response.data);[m
+[32m+[m[32m    });[m
+     closeDialogs();[m
+     await fetchConferences();[m
+   } catch (error) {[m
+[36m@@ -169,7 +169,6 @@[m [masync function updateConference() {[m
+       capacity: selectedConference.value.capacity,[m
+       organizer_id: selectedConference.value.organizer_id,[m
+     });[m
+[31m-    console.log("Conference updated:", response.data);[m
+     closeDialogs();[m
+     await fetchConferences();[m
+ [m
+[36m@@ -182,7 +181,6 @@[m [masync function updateConference() {[m
+ [m
+ function openUpdateDialog(conference) {[m
+     if (conference) {[m
+[31m-      console.log("Opening update dialog for conference:", conference); // Debug log[m
+       selectedConference.value = { ...conference }; // Deep copy to avoid directly modifying the original object[m
+       updateDialog.value = true;[m
+     } else {[m
+[1mdiff --git a/iis-frontend/src/components/PresentationsView.vue b/iis-frontend/src/components/PresentationsView.vue[m
+[1mindex bdd4981..5dca347 100644[m
+[1m--- a/iis-frontend/src/components/PresentationsView.vue[m
+[1m+++ b/iis-frontend/src/components/PresentationsView.vue[m
+[36m@@ -43,7 +43,6 @@[m [masync function getConferences() {[m
+     conferences.forEach(conference => {[m
+       conferenceMap.value[conference.id] = conference.name; // Map conference_id to name[m
+     });[m
+[31m-    console.log(conferenceMap.value);[m
+   } catch (error) {[m
+     console.error('Error fetching conferences:', error);[m
+   }[m
+[36m@@ -134,8 +133,7 @@[m [masync function updatePresentation() {[m
+   loading.value = true;[m
+   showerror.value = false;[m
+ [m
+[31m-  const rawPresentation = toRaw(selectedPresentation.value); // Extract raw data[m
+[31m-  console.log("Raw Presentation Data:", rawPresentation);[m
+[32m+[m[32m  const rawPresentation = toRaw(selectedPresentation.value);[m[41m [m
+ [m
+   const { id, conference_id, proposal, status } = rawPresentation;[m
+ [m
+[36m@@ -169,7 +167,6 @@[m [masync function deletePresentation(presentation) {[m
+   loading.value = true;[m
+ [m
+   try {[m
+[31m-    console.log(presentation);[m
+     const response = await axiosInstance.delete(`/given_presentation/${presentation.id}`)[m
+     getPresentations();[m
+   } catch (error) {[m
+[1mdiff --git a/iis-frontend/src/components/PublicDetailView.vue b/iis-frontend/src/components/PublicDetailView.vue[m
+[1mindex 7369fb0..1b9ae23 100644[m
+[1m--- a/iis-frontend/src/components/PublicDetailView.vue[m
+[1m+++ b/iis-frontend/src/components/PublicDetailView.vue[m
+[36m@@ -2,6 +2,7 @@[m
+ // url props[m
+ import router, {authentiatedAxiosInstance, axiosInstance, isLoggedIn} from "@/router";[m
+ import {onMounted, ref} from "vue";[m
+[32m+[m[32mimport { ca } from "vuetify/locale";[m
+ [m
+ const props = defineProps({[m
+   id: String[m
+[36m@@ -51,12 +52,8 @@[m [masync function getEnrichedConference(id) {[m
+ }[m
+ [m
+ async function doReservation() {[m
+[31m-  console.log('doReservation')[m
+[31m-  // for guest users[m
+   if (!isLoggedIn()) {[m
+[31m-    console.log('not logged in')[m
+     // create user[m
+[31m-    // create reservation[m
+     try {[m
+       const response = await authentiatedAxiosInstance.post(`/reservation/`, {[m
+         "number_of_tickets": newReservation.value.number_of_tickets,[m
+[36m@@ -66,6 +63,13 @@[m [masync function doReservation() {[m
+         "approved": false,[m
+       });[m
+       newReservation.value = response.data;[m
+[32m+[m[32m      try{[m
+[32m+[m[32m        const userResponse = await authentiatedAxiosInstance.get(`user/${newReservation.value.user_id}`);[m
+[32m+[m[32m        me.value = userResponse.data;[m[41m [m
+[32m+[m[32m      }[m
+[32m+[m[32m      catch(error){[m
+[32m+[m[32m        console.error('Error fetching user data:', error);[m
+[32m+[m[32m      }[m
+       showGuestReservationConfirmation.value = true;[m
+     } catch (error) {[m
+       console.error('Error creating reservation:', error);[m
+[36m@@ -74,7 +78,6 @@[m [masync function doReservation() {[m
+ [m
+   // for logged in users[m
+   else {[m
+[31m-    console.log('logged in')[m
+     // create reservation[m
+     try {[m
+       const response = await authentiatedAxiosInstance.post(`/reservation/`, {[m
+[36m@@ -96,7 +99,6 @@[m [masync function doReservation() {[m
+ onMounted(() => {[m
+   getEnrichedConference(props.id);[m
+   getMyDetails();[m
+[31m-  console.log("Conference fetched")[m
+ })[m
+ </script>[m
+ [m
+[36m@@ -127,7 +129,8 @@[m [monMounted(() => {[m
+             Rezerovat vstupenky můžete i bez registrace.<br> Po rezervaci vám bude zaslána potvrzovací zpráva.[m
+           </v-banner>[m
+           <v-banner icon="mdi-check" color="success" v-show="showGuestReservationConfirmation">[m
+[31m-            Děkujeme za rezervaci vstupenek na konferenci.<br> Na email {{me.email}} vám byla zaslána potvrzovací zpráva.[m
+[32m+[m[32m            Děkujeme za rezervaci vstupenek na konferenci.<br> Na email {{me.email}} vám byla zaslána potvrzovací zpráva.[m[41m [m
+[32m+[m[32m            <br>Do systému se můžeme přihlásit heslem {{ me.name }}[m
+           </v-banner>[m
+           <v-banner icon="mdi-check" color="success" v-show="showUserReservationConfirmation">[m
+             Děkujeme za rezervaci vstupenek na konferenci.<br> Rezervaci najdete ve svém účtu.[m
+[1mdiff --git a/iis-frontend/src/components/PublicView.vue b/iis-frontend/src/components/PublicView.vue[m
+[1mindex c5ead22..3559991 100644[m
+[1m--- a/iis-frontend/src/components/PublicView.vue[m
+[1m+++ b/iis-frontend/src/components/PublicView.vue[m
+[36m@@ -11,7 +11,6 @@[m [mconst loading = ref(true)[m
+ async function fetchConferences() {[m
+   loading.value = true;[m
+   try {[m
+[31m-    console.log('get');[m
+     const response = await axiosInstance.get('/conferences/all');[m
+     conferences.value = response.data;[m
+   } catch (error) {[m
+[36m@@ -27,7 +26,6 @@[m [mfunction showConferenceDetail(id) {[m
+ [m
+ onMounted(() => {[m
+   getEnrichedConferences();[m
+[31m-  console.log("Conferences fetched")[m
+ })[m
+ [m
+ async function getEnrichedConferences() {[m
+[1mdiff --git a/iis-frontend/src/components/ReservationsView.vue b/iis-frontend/src/components/ReservationsView.vue[m
+[1mindex b0b8343..ff3c59b 100644[m
+[1m--- a/iis-frontend/src/components/ReservationsView.vue[m
+[1m+++ b/iis-frontend/src/components/ReservationsView.vue[m
+[36m@@ -76,7 +76,6 @@[m [masync function getReservationsToApprove() {[m
+     const currentUserId = localStorage.getItem('userId');[m
+     const conferences = response.data.filter(conference => conference.organizer_id == currentUserId);[m
+     reservationsToApprove.value = await getUserReservations(conferences);[m
+[31m-    console.log(reservationsToApprove.value);[m
+   } catch (error) {[m
+     console.error('Error fetching conferences:', error);[m
+   } finally {[m
+[36m@@ -139,7 +138,6 @@[m [monMounted(()=>{[m
+   <v-progress-linear indeterminate v-if="loadingMyReservations"/>[m
+   <div v-else-if="myReservations.length === 0" class="mx-auto text-center">[m
+     Ještě nemáte žádné rezervace[m
+[31m-    console.log(myReservations.value);[m
+   </div>[m
+   <v-list v-else>[m
+     <template v-for="item in myReservations" :key="item.conference.id">[m
+[1mdiff --git a/iis-frontend/src/components/RoomsView.vue b/iis-frontend/src/components/RoomsView.vue[m
+[1mindex 482060e..ccd3794 100644[m
+[1m--- a/iis-frontend/src/components/RoomsView.vue[m
+[1m+++ b/iis-frontend/src/components/RoomsView.vue[m
+[36m@@ -112,7 +112,6 @@[m [masync function updateRoom() {[m
+       conference_id: newRoom.value.conference_id,[m
+     });[m
+ [m
+[31m-    console.log('Room updated:', response.data);[m
+     closeDialogs();[m
+     await getUser();[m
+   } catch (error) {[m
+[1mdiff --git a/iis-frontend/src/components/TicketsView.vue b/iis-frontend/src/components/TicketsView.vue[m
+[1mindex a06c5c2..58f5abe 100644[m
+[1m--- a/iis-frontend/src/components/TicketsView.vue[m
+[1m+++ b/iis-frontend/src/components/TicketsView.vue[m
+[36m@@ -12,10 +12,8 @@[m [masync function getReservations() {[m
+     let me = {}[m
+     const response = await axiosInstance.get('/user/me');[m
+     me = response.data;[m
+[31m-    console.log(me);[m
+     const response2 = await axiosInstance.get('/reservation/user/' + me.id);[m
+     myReservations.value = response2.data;[m
+[31m-    console.log(myReservations.value);[m
+   } catch (error) {[m
+     console.error(error);[m
+   }[m
+[36m@@ -31,8 +29,6 @@[m [masync function getReservations() {[m
+       console.error(error);[m
+     }[m
+   }[m
+[31m-  console.log(enrichedReservations.value);[m
+[31m-  console.log(myReservations.value);[m
+ }[m
+ [m
+ async function cancelReservation(id) {[m
+[1mdiff --git a/iis-frontend/src/components/VotingView.vue b/iis-frontend/src/components/VotingView.vue[m
+[1mindex 274134c..8f14e00 100644[m
+[1m--- a/iis-frontend/src/components/VotingView.vue[m
+[1m+++ b/iis-frontend/src/components/VotingView.vue[m
+[36m@@ -27,7 +27,6 @@[m [masync function fetchConferences() {[m
+   } catch (error) {[m
+     console.error('Error fetching conferences:', error)[m
+   }[m
+[31m-  console.log(attendedConferences.value)[m
+ }[m
+ [m
+ function showRatingDialog(id) {[m
+[36m@@ -42,7 +41,6 @@[m [masync function rateLecture() {[m
+       "lecture_id": ratingId.value,[m
+       "user_id": localStorage.getItem('userId')[m
+     })[m
+[31m-    console.log(response.data)[m
+     ratingDialog.value = false[m
+     snackbar.value = true[m
+   } catch (error) {[m

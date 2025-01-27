@@ -2,6 +2,7 @@
 // url props
 import router, {authentiatedAxiosInstance, axiosInstance, isLoggedIn} from "@/router";
 import {onMounted, ref} from "vue";
+import { ca } from "vuetify/locale";
 
 const props = defineProps({
   id: String
@@ -51,12 +52,8 @@ async function getEnrichedConference(id) {
 }
 
 async function doReservation() {
-  console.log('doReservation')
-  // for guest users
   if (!isLoggedIn()) {
-    console.log('not logged in')
     // create user
-    // create reservation
     try {
       const response = await authentiatedAxiosInstance.post(`/reservation/`, {
         "number_of_tickets": newReservation.value.number_of_tickets,
@@ -66,6 +63,13 @@ async function doReservation() {
         "approved": false,
       });
       newReservation.value = response.data;
+      try{
+        const userResponse = await authentiatedAxiosInstance.get(`user/${newReservation.value.user_id}`);
+        me.value = userResponse.data;
+      }
+      catch(error){
+        console.error('Error fetching user data:', error);
+      }
       showGuestReservationConfirmation.value = true;
     } catch (error) {
       console.error('Error creating reservation:', error);
@@ -74,7 +78,6 @@ async function doReservation() {
 
   // for logged in users
   else {
-    console.log('logged in')
     // create reservation
     try {
       const response = await authentiatedAxiosInstance.post(`/reservation/`, {
@@ -96,7 +99,6 @@ async function doReservation() {
 onMounted(() => {
   getEnrichedConference(props.id);
   getMyDetails();
-  console.log("Conference fetched")
 })
 </script>
 
@@ -128,6 +130,7 @@ onMounted(() => {
           </v-banner>
           <v-banner icon="mdi-check" color="success" v-show="showGuestReservationConfirmation">
             Děkujeme za rezervaci vstupenek na konferenci.<br> Na email {{me.email}} vám byla zaslána potvrzovací zpráva.
+            <br>Do systému se můžeme přihlásit heslem {{ me.name }}
           </v-banner>
           <v-banner icon="mdi-check" color="success" v-show="showUserReservationConfirmation">
             Děkujeme za rezervaci vstupenek na konferenci.<br> Rezervaci najdete ve svém účtu.

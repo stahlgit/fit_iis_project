@@ -11,7 +11,6 @@ const loading = ref(true)
 async function fetchConferences() {
   loading.value = true;
   try {
-    console.log('get');
     const response = await axiosInstance.get('/conferences/all');
     conferences.value = response.data;
   } catch (error) {
@@ -27,7 +26,6 @@ function showConferenceDetail(id) {
 
 onMounted(() => {
   getEnrichedConferences();
-  console.log("Conferences fetched")
 })
 
 async function getEnrichedConferences() {

@@ -1,70 +1,70 @@
-@startuml
-left to right direction
+    @startuml
+    left to right direction
 
-actor ADMIN
-actor REGISTERED
-actor GUEST
+    actor ADMIN
+    actor REGISTERED
+    actor GUEST
 
-rectangle "Conference planning system" {
+    rectangle "Conference planning system" {
 
-' ADMIN
-usecase "Manage Users" as UC1
-usecase "Grant Rights" as UC1.1
-usecase "Remove Users" as UC1.2
-
-
-' REGISTERED
-'Manager
-usecase "Create Conference" as UC2
-usecase "Create Conference Time Schedule" as UC3
-usecase "Manage Conference Rooms" as UC4
-usecase "Approve Reservation - Give Tickets" as UC4
-
-'Manager->Presenter
-usecase "Approve Presentations" as UC5
-
-'Participant->Presenter
-usecase "Submit Presentation" as UC6
-
-'Presenter/Participant version
-usecase "View Presentations" as UC7
-usecase "Remove Presentation" as UC8
-
-'Participant
-usecase "Add Presentation" as UC9
-usecase "Ask Questions" as UC10
-usecase "Vote for Presentation" as UC11
+    ' ADMIN
+    usecase "Manage Users" as UC1
+    usecase "Grant Rights" as UC1.1
+    usecase "Remove Users" as UC1.2
 
 
-' GUEST
-usecase "Make Reservation" as UC12
-usecase "Pay for Reservation" as UC13
-usecase "View Conferences" as UC14
-usecase "View Conference Time Schedule" as UC15
-usecase "View Conference Capacity" as UC16
-}
+    ' REGISTERED
+    'Manager
+    usecase "Create Conference" as UC2
+    usecase "Create Conference Time Schedule" as UC3
+    usecase "Manage Conference Rooms" as UC4
+    usecase "Approve Reservation - Give Tickets" as UC4
 
-ADMIN --> UC1
-ADMIN --> UC1.1
-ADMIN --> UC1.2
+    'Manager->Presenter
+    usecase "Approve Presentations" as UC5
 
-REGISTERED --> UC2
-REGISTERED --> UC3
-REGISTERED --> UC4
-REGISTERED --> UC5
-REGISTERED --> UC6
-REGISTERED --> UC7
-REGISTERED --> UC8
-REGISTERED --> UC9
-REGISTERED --> UC10
-REGISTERED --> UC11
-REGISTERED --> UC12
-REGISTERED --> UC13
+    'Participant->Presenter
+    usecase "Submit Presentation" as UC6
 
-GUEST --> UC14
-GUEST --> UC15
-GUEST --> UC16
+    'Presenter/Participant version
+    usecase "View Presentations" as UC7
+    usecase "Remove Presentation" as UC8
 
-ADMIN --|> REGISTERED
-REGISTERED --|> GUEST
-@enduml
+    'Participant
+    usecase "Add Presentation" as UC9
+    usecase "Ask Questions" as UC10
+    usecase "Vote for Presentation" as UC11
+
+
+    ' GUEST
+    usecase "Make Reservation" as UC12
+    usecase "Pay for Reservation" as UC13
+    usecase "View Conferences" as UC14
+    usecase "View Conference Time Schedule" as UC15
+    usecase "View Conference Capacity" as UC16
+    }
+
+    ADMIN --> UC1
+    ADMIN --> UC1.1
+    ADMIN --> UC1.2
+
+    REGISTERED --> UC2
+    REGISTERED --> UC3
+    REGISTERED --> UC4
+    REGISTERED --> UC5
+    REGISTERED --> UC6
+    REGISTERED --> UC7
+    REGISTERED --> UC8
+    REGISTERED --> UC9
+    REGISTERED --> UC10
+    REGISTERED --> UC11
+    REGISTERED --> UC12
+    REGISTERED --> UC13
+
+    GUEST --> UC14
+    GUEST --> UC15
+    GUEST --> UC16
+
+    ADMIN --|> REGISTERED
+    REGISTERED --|> GUEST
+    @enduml

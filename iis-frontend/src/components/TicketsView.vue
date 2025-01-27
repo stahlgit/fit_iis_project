@@ -12,10 +12,8 @@ async function getReservations() {
     let me = {}
     const response = await axiosInstance.get('/user/me');
     me = response.data;
-    console.log(me);
     const response2 = await axiosInstance.get('/reservation/user/' + me.id);
     myReservations.value = response2.data;
-    console.log(myReservations.value);
   } catch (error) {
     console.error(error);
   }
@@ -31,8 +29,6 @@ async function getReservations() {
       console.error(error);
     }
   }
-  console.log(enrichedReservations.value);
-  console.log(myReservations.value);
 }
 
 async function cancelReservation(id) {

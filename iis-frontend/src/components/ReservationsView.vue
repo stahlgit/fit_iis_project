@@ -76,7 +76,6 @@ async function getReservationsToApprove() {
     const currentUserId = localStorage.getItem('userId');
     const conferences = response.data.filter(conference => conference.organizer_id == currentUserId);
     reservationsToApprove.value = await getUserReservations(conferences);
-    console.log(reservationsToApprove.value);
   } catch (error) {
     console.error('Error fetching conferences:', error);
   } finally {
@@ -139,7 +138,6 @@ onMounted(()=>{
   <v-progress-linear indeterminate v-if="loadingMyReservations"/>
   <div v-else-if="myReservations.length === 0" class="mx-auto text-center">
     Ještě nemáte žádné rezervace
-    console.log(myReservations.value);
   </div>
   <v-list v-else>
     <template v-for="item in myReservations" :key="item.conference.id">
